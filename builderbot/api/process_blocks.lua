@@ -8,7 +8,7 @@ return function(blocks)
    end
    -- calculate the camera position
    local camera_position =
-      robot.constants.end_effector_position_offset +
+      robot.api.constants.end_effector_position_offset +
       robot.camera_system.transform.position +
       vector3(0, 0, robot.lift_system.position)
    -- track blocks

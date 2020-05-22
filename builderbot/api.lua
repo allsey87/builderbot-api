@@ -9,7 +9,7 @@ return {
       -- TODO make these parameters
       lift_system_rf_cover_threshold = 0.06,
       lift_system_position_tolerance = 0.001,
-   }
+   },
    --[[ initialize parameters ]]--
    parameters = {
       default_speed =
@@ -26,7 +26,7 @@ return {
          tonumber(robot.params.proximity_detect_tolerance or 0.03),
       proximity_maximum_distance =
          tonumber(robot.params.proximity_maximum_distance or 0.05),
-   }
+   },
    --[[ initialize submodules ]]--
    match_rules =
       require('api.match_rules'),

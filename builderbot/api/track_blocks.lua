@@ -189,7 +189,7 @@ end
 
 function CheckTagDirection(block)
    for i, tag in ipairs(block.tags) do
-      local dif = (tag.position - block.position) * (1/robot.constants.block_side_length) * 2
+      local dif = (tag.position - block.position) * (1/robot.api.constants.block_side_length) * 2
       if (block.X - dif):length() < 0.5 then
          block.tags.front = tag
       elseif (block.Z - dif):length() < 0.5 then
@@ -209,14 +209,14 @@ function BlockTracking(_blocks, _tags)
    local blocks = {}
 
    -- cluster tags into blocks
-   local p = vector3(0, 0, -robot.constants.block_side_length/2)
+   local p = vector3(0, 0, -robot.api.constants.block_side_length/2)
    for i, tag in ipairs(_tags) do
       local middlePointV3 = vector3(p):rotate(tag.orientation) + tag.position
 
       -- find which block it belongs
       local flag = 0
       for j, block in ipairs(blocks) do
-         if (middlePointV3 - block.position):length() < robot.constants.block_side_length/3 then
+         if (middlePointV3 - block.position):length() < robot.api.constants.block_side_length/3 then
             flag = 1
             block.tags[#block.tags + 1] = tag
             block.positionSum = block.positionSum + middlePointV3

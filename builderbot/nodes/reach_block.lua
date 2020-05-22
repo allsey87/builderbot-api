@@ -40,11 +40,11 @@ return function(target, distance)
                      robot.nodes.create_timer_node({time = 3,}),
                      -- forward to block
                      robot.nodes.create_timer_node({
-                        time = (distance - robot.constants.end_effector_position_offset.x) /
-                           robot.parameters.default_speed,
+                        time = (distance - robot.api.constants.end_effector_position_offset.x) /
+                           robot.api.parameters.default_speed,
                         func = function()
-                           robot.api.move.with_velocity(robot.parameters.default_speed, 
-                                                        robot.parameters.default_speed)
+                           robot.api.move.with_velocity(robot.api.parameters.default_speed, 
+                                                        robot.api.parameters.default_speed)
                         end,
                      })
                   },
@@ -72,11 +72,11 @@ return function(target, distance)
                      }),
                      -- forward to block
                      robot.nodes.create_timer_node({
-                        time = (distance - robot.constants.end_effector_position_offset.x - 0.005) /
-                               robot.parameters.default_speed,
+                        time = (distance - robot.api.constants.end_effector_position_offset.x - 0.005) /
+                               robot.api.parameters.default_speed,
                         func = function()
-                           robot.api.move.with_velocity(robot.parameters.default_speed, 
-                                                        robot.parameters.default_speed)
+                           robot.api.move.with_velocity(robot.api.parameters.default_speed, 
+                                                        robot.api.parameters.default_speed)
                            end,
                      })
                   },
@@ -102,11 +102,11 @@ return function(target, distance)
                      robot.nodes.create_timer_node({time = 3,}),
                      -- forward in front of block
                      robot.nodes.create_timer_node({
-                        time = (distance - robot.constants.end_effector_position_offset.x - 0.060) /
-                                robot.parameters.default_speed,
+                        time = (distance - robot.api.constants.end_effector_position_offset.x - 0.060) /
+                                robot.api.parameters.default_speed,
                         func = function()
-                           robot.api.move(robot.parameters.default_speed, 
-                                          robot.parameters.default_speed)
+                           robot.api.move(robot.api.parameters.default_speed, 
+                                          robot.api.parameters.default_speed)
                            end,
                      })
                   },
@@ -132,11 +132,11 @@ return function(target, distance)
                      robot.nodes.create_timer_node({time = 3,}),
                      -- forward in front of block
                      robot.nodes.create_timer_node({
-                        time = (distance - robot.constants.end_effector_position_offset.x - 0.060) /
-                               robot.parameters.default_speed,
+                        time = (distance - robot.api.constants.end_effector_position_offset.x - 0.060) /
+                               robot.api.parameters.default_speed,
                         func = function()
-                           robot.api.move.with_velocity(robot.parameters.default_speed, 
-                                                        robot.parameters.default_speed)
+                           robot.api.move.with_velocity(robot.api.parameters.default_speed, 
+                                                        robot.api.parameters.default_speed)
                            end,
                      })
                   },
@@ -162,11 +162,11 @@ return function(target, distance)
                      robot.nodes.create_timer_node({time = 5,}),
                      -- forward in front of block
                      robot.nodes.create_timer_node({
-                        time = (distance - robot.constants.end_effector_position_offset.x - 0.060) /
-                               robot.parameters.default_speed,
+                        time = (distance - robot.api.constants.end_effector_position_offset.x - 0.060) /
+                               robot.api.parameters.default_speed,
                         func = function()
-                           robot.api.move.with_velocity(robot.parameters.default_speed, 
-                                                        robot.parameters.default_speed)
+                           robot.api.move.with_velocity(robot.api.parameters.default_speed, 
+                                                        robot.api.parameters.default_speed)
                         end
                      })
                   },

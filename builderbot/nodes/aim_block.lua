@@ -25,10 +25,10 @@ return function(data, aim_point)
                if v.y > target_tag.corners.down then target_tag.corners.down = v.y end
             end
 
-            local tolerance = robot.parameters.lift_system_position_tolerance
+            local tolerance = robot.api.parameters.lift_system_position_tolerance
             local target_height = robot.lift_system.position - target_tag.position.y -- TODO: refine this calculation
-            local upper_limit = robot.parameters.lift_system_upper_limit
-            local lower_limit = robot.parameters.lift_system_lower_limit + target_block.position_robot.z - 0.02
+            local upper_limit = robot.api.parameters.lift_system_upper_limit
+            local lower_limit = robot.api.parameters.lift_system_lower_limit + target_block.position_robot.z - 0.02
             if target_height < lower_limit then target_height = lower_limit end
             if target_height > upper_limit then target_height = upper_limit end
             if robot.lift_system.position > target_height - tolerance and 
@@ -66,7 +66,7 @@ return function(data, aim_point)
                   flag_orientation = true
                end
             else
-               local tolerence = robot.parameters.aim_block_angle_tolerance 
+               local tolerence = robot.api.parameters.aim_block_angle_tolerance 
                local angle = math.atan(target_block.position_robot.y / target_block.position_robot.x) * 180 / math.pi  -- x should always be positive
                if angle < -tolerence then
                   turn = "right"

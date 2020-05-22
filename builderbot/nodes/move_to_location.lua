@@ -65,13 +65,13 @@ return function(data, location)
 
             -- dis
             dis = math.sqrt(location.position.x ^ 2 + location.position.y ^ 2)
-            move_dis_timer_parameter.time = dis / robot.parameters.default_speed
+            move_dis_timer_parameter.time = dis / robot.api.parameters.default_speed
             if backup_mode == false then
-               move_dis_timer_parameter.func = function() robot.api.move.with_bearing(api.parameters.default_speed, 0) end
+               move_dis_timer_parameter.func = function() robot.api.move.with_bearing(robot.api.parameters.default_speed, 0) end
             else
-               move_dis_timer_parameter.func = function() robot.api.move.with_bearing(-api.parameters.default_speed, 0) end
+               move_dis_timer_parameter.func = function() robot.api.move.with_bearing(-robot.api.parameters.default_speed, 0) end
             end
-            --move_dis_timer_parameter.func = function() robot.api.move.with_velocity(robot.parameters.default_speed, robot.parameters.default_speed) end
+            --move_dis_timer_parameter.func = function() robot.api.move.with_velocity(robot.api.parameters.default_speed, robot.api.parameters.default_speed) end
             robot.logger("dis = ", dis)
 
             -- th2   -- assume orientation is always around z axis

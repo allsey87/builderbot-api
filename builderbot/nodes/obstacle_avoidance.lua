@@ -22,8 +22,8 @@ return function(data)
                      flag = true
                      break
                   elseif v.source == 'left' or v.source == 'right' then
-                     if robot.rangefinders['underneath'].proximity > api.parameters.proximity_touch_tolerance then
-                        if robot.lift_system.position < api.parameters.lift_system_rf_cover_threshold then
+                     if robot.rangefinders['underneath'].proximity > robot.api.parameters.proximity_touch_tolerance then
+                        if robot.lift_system.position < robot.api.parameters.lift_system_rf_cover_threshold then
                            -- print('left right maip down normal')
 
                            flag = true
@@ -31,7 +31,7 @@ return function(data)
                         end
                      end
                   elseif v.source == '1' or v.source == '12' then
-                     if robot.lift_system.position >= api.parameters.lift_system_rf_cover_threshold then
+                     if robot.lift_system.position >= robot.api.parameters.lift_system_rf_cover_threshold then
                         -- print('1 12 manip up')
                         -- pprint.pprint(v)
                         flag = true

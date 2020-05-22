@@ -29,7 +29,7 @@ return function(data, target_distance)
             local robot_to_block = vector3(-target_block.position_robot):rotate(target_block.orientation_robot:inverse())
             local angle = math.atan(robot_to_block.y / robot_to_block.x) * 180 / math.pi
             robot.logger("angle is ", angle)
-            local tolerance = robot.parameters.aim_block_angle_tolerance * 3
+            local tolerance = robot.api.parameters.aim_block_angle_tolerance * 3
 
             if angle > 40 or angle < -40 then return false, false end
 
@@ -67,8 +67,8 @@ return function(data, target_distance)
          -- forward or backup
          function()
             local target_block = robot.llapi.blocks[target.reference_id]
-            local tolerence = robot.parameters.block_position_tolerance
-            local default_speed = robot.parameters.default_speed
+            local tolerence = robot.api.parameters.block_position_tolerance
+            local default_speed = robot.api.parameters.default_speed
 
             robot.logger(case)
 

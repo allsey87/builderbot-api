@@ -13,8 +13,10 @@ return function(rule_node)
             children = {
                -- if lift reach position(0.07), return true, stop selector
                function()
-                  if robot.lift_system.position > api.parameters.lift_system_upper_limit - api.parameters.lift_system_position_tolerance and
-                     robot.lift_system.position < api.parameters.lift_system_upper_limit + api.parameters.lift_system_position_tolerance then
+                  if (robot.lift_system.position > robot.api.parameters.lift_system_upper_limit - 
+                        robot.api.parameters.lift_system_position_tolerance) and
+                     (robot.lift_system.position < robot.api.parameters.lift_system_upper_limit +
+                        robot.api.parameters.lift_system_position_tolerance) then
                      robot.logger("search_in position")
                      return false, true
                   else
@@ -24,7 +26,7 @@ return function(rule_node)
                end,
                -- set position(0.07)
                function()
-                  robot.lift_system.set_position(api.parameters.lift_system_upper_limit)
+                  robot.lift_system.set_position(robot.api.parameters.lift_system_upper_limit)
                   return true -- always running
                end,
             },
@@ -41,9 +43,13 @@ return function(rule_node)
                      robot.nodes.create_obstacle_avoidance_node(),
                      -- obstacle clear, random walk
                      function()
-                        local random_angle = math.random(-api.parameters.search_random_range, api.parameters.search_random_range)
-                        --api.move(-api.parameters.default_speed, api.parameters.default_speed)
-                        robot.api.move.with_bearing(api.parameters.default_speed, random_angle)
+                        -- TODO use robot.random
+                        local random_angle =
+                           math.random(-robot.api.parameters.search_random_range,
+                                        robot.api.parameters.search_random_range)
+                        --robot.api.move(-robot.api.parameters.default_speed, robot.api.parameters.default_speed)
+                        robot.api.move.with_bearing(robot.api.parameters.default_speed,
+                                                    random_angle)
                         return false, true
                      end,
                   },
