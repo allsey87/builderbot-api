@@ -2,6 +2,7 @@ if robot.logger then
    robot.logger.register_module("utils.hungarian")
 end
 
+-- TODO remove this function and use robot.utils.deep_copy()?
 local function copy(orig,n,m)
    local copy = {}
    for i = 1,n do
@@ -14,6 +15,7 @@ local function copy(orig,n,m)
 end
 
 -- get the size of a table, no matter square or not
+-- TODO: use snake_case
 local function getNM_Mat(Mat)
    --[[
    find the size of a Mat
@@ -83,11 +85,11 @@ function Hungarian:create(configuration)
 
    -- check and get N
    if n == -1 or m == -1 then
-      print("invalid costMat")
+      robot.logger("invalid costMat")
       return nil
    end
    if n ~= m then
-      print("non square")
+      robot.logger("non square")
       -- to be filled
       return nil
          -- temporarily
@@ -95,6 +97,7 @@ function Hungarian:create(configuration)
    instance.N = n
 
    ---------------- min or max problem ----------------
+   -- TODO: use a boolean for this
    if configuration.MAXorMIN == "MIN" then
       for i = 1,n do
          for j = 1,n do
@@ -114,6 +117,7 @@ function Hungarian:create(configuration)
    --local i,j -- in lua this is not necessary, the i in for is local to for
    for i = 1,n do instance.ly[i] = 0 end
       --label of Y is all 0
+   -- TODO: math.huge   
    for i = 1,n do instance.lx[i] = instance.costMat[1][1] - 99999999999 end  -- set to -INF
       --lx is the max of his cost edges      -- for max problem
    for i = 1,n do 

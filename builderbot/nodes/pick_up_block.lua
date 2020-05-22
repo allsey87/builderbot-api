@@ -45,7 +45,7 @@ return function(data, forward_distance)
                   robot.electromagnet_system.set_discharge_mode('constructive')
                end,
                -- wait for 2 sec
-               robot.nodes.create_timer_node({time = 2}),
+               robot.nodes.create_timer_node(data, 2),
                -- raise
                function()
                   robot.logger('raising')
@@ -60,7 +60,7 @@ return function(data, forward_distance)
          },
          -- check success
          -- wait
-         robot.nodes.create_timer_node({time = 2}),
+         robot.nodes.create_timer_node(data, 2),
          function()
             if robot.rangefinders['underneath'].proximity < robot.api.parameters.proximity_touch_tolerance then
                return false, true -- not running, true
@@ -70,8 +70,8 @@ return function(data, forward_distance)
          end,
          -- change color
          function()
-            if target.type ~= nil then
-               api.set_type(target.type)
+            if data.target.type ~= nil then
+               robot.nfc.write(tostring(data.target.type))
                return false, true
             end
          end

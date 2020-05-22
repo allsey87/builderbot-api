@@ -2,6 +2,13 @@ return {
    --[[ initialize constants ]]--
    constants = {
       block_side_length = 0.055,
+      -- from x+, counter-closewise
+      block_led_offset_from_tag = {
+         vector3(0.02,  0,    0),
+         vector3(0,     0.02, 0),
+         vector3(-0.02, 0,    0),
+         vector3(0,    -0.02, 0)
+      },
       -- TODO move into the SRoCS API
       lift_system_upper_limit = 0.135,
       lift_system_lower_limit = 0,
@@ -9,6 +16,7 @@ return {
       -- TODO make these parameters
       lift_system_rf_cover_threshold = 0.06,
       lift_system_position_tolerance = 0.001,
+
    },
    --[[ initialize parameters ]]--
    parameters = {

@@ -2,7 +2,7 @@ if robot.logger then
    robot.logger.register_module("nodes.search_block")
 end
 
-return function(rule_node)
+return function(data, rule_node)
    -- create a search node based on rule_node
    return {
       type = "sequence*",

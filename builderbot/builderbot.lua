@@ -6,8 +6,8 @@ function init()
    robot.utils = require('utils')
    robot.api = require('api')
    robot.nodes = require('nodes')
-   --[[ configure and initialize behavior tree ]]--
-   local data = {
+   --[[ initialize shared data ]]--
+   data = {
       target = {
          id = 1,
          offset = vector3(0,0,0),
@@ -15,6 +15,7 @@ function init()
       },
       blocks = {}
    }
+   --[[ configure and initialize behavior tree ]]--
    local top_level_node = {
       type = 'sequence*',
       children = {
@@ -41,15 +42,15 @@ end
 
 function step()
    robot.logger('[step: clock = ]')
-   robot.api.process_blocks()
+   robot.api.process_blocks(data.blocks)
    robot.api.process_obstacles()
    robot.behavior()
 end
 
 function reset()
     robot.logger('[reset: clock = ]')
-    -- recreate data
-    -- 
+    -- TODO: recreate init shared data
+    -- TODO: recreate behavior tree
 end
 
 function destroy()

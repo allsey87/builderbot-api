@@ -2,13 +2,25 @@ if robot.logger then
    robot.logger.register_module("nodes.move_to_location")
 end
 
--- TODO this solution is not good since multiple modules would conflict with each other
-local reset_local_data(table)
-   table['move_to_location'].dis = nil
-   table['move_to_location'].th = nil
-   table['move_to_location'].turn_th_timer_parameter = nil
-   table['move_to_location'].move_dis_timer_parameter = nil
-   table['move_to_location'].turn_th2_timer_parameter = nil
+-- TODO check if we can remove first node of the tree below since it effectively just a function
+-- please come up with better names for th, dis, th2: these names are almost cryptic
+-- private functions for calculating th, dis, th2
+local function calculate_th(location)
+   local time = 0
+   local run = function()
+   return time, run
+end
+
+local function calculate_dis(location)
+   local time = 0
+   local run = function()
+   return time, run
+end
+
+local function calculate_th2(location)
+   local time = 0
+   local run = function()
+   return time, run
 end
 
 -- move to the location (position and orientation) blindly
@@ -27,10 +39,8 @@ end
 --              |   \th|
 --              | th2\ |
 --              | <---\
-
 return function(data, location)
-   -- TODO move these inside data so that they can be reset
-   -- TODO possible solution: reset_local_data
+   -- TODO does this data need to be persistent between runs? If so, how and when should it be reset?
    local th, dis, th2
    local turn_th_timer_parameter = {}
    local move_dis_timer_parameter = {}
@@ -99,18 +109,23 @@ return function(data, location)
             robot.camera_system.disable()
             return false, true
          end,
+         -- TODO is it necessary to repeatedly call xxx_timer_parameter.func via the timer node? Is once not sufficient?
          -- turn th
          function() robot.logger("turn th") return false, true end,
-         robot.nodes.create_timer_node(turn_th_timer_parameter),
+         robot.nodes.create_timer_node(data, turn_th_timer_parameter.time, turn_th_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(data, calculate_th(distance)),
          -- move dis
          function() robot.logger("move dis") return false, true end,
-         robot.nodes.create_timer_node(move_dis_timer_parameter),
+         robot.nodes.create_timer_node(data, move_dis_timer_parameter.time, move_dis_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(data, calculate_dis(distance)),
          -- turn th2
          function() robot.logger("turn th2") return false, true end,
-         robot.nodes.create_timer_node(turn_th2_timer_parameter),
+         robot.nodes.create_timer_node(data, turn_th2_timer_parameter.time, turn_th2_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(data, calculate_th2(distance)),
          -- stop moving
          function() 
-            robot.api.move.with_velocity(0,0) 
+            robot.api.move.with_velocity(0,0)
+            -- TODO I am not convinced this is the right place to be enabling/disabling the camera...
             robot.camera_system.enable()
             return false, true 
          end,

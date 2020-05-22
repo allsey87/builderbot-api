@@ -13,7 +13,7 @@ return function(data, target_distance)
          robot.nodes.create_obstacle_avoidance_node(data),
          -- check the target block is still there 
          function()
-            if data.blocks[data.target.id] == nil then
+            if data.target.id == nil or data.blocks[data.target.id] == nil then
                robot.logger("block is nil")
                robot.api.move.with_velocity(0,0)
                return false, false
@@ -63,10 +63,10 @@ return function(data, target_distance)
             return false, true
          end,
          -- aim
-         robot.nodes.create_aim_block_node(target, aim),
+         robot.nodes.create_aim_block_node(data, aim),
          -- forward or backup
          function()
-            local target_block = robot.llapi.blocks[target.reference_id]
+            local target_block = data.blocks[data.target.id]
             local tolerence = robot.api.parameters.block_position_tolerance
             local default_speed = robot.api.parameters.default_speed
 

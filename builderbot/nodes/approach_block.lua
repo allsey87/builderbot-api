@@ -14,7 +14,7 @@ return function(data, search_node, distance)
             children = {
                -- check range
                function()
-                  local target_block = data.blocks[data.target.reference_id]
+                  local target_block = data.blocks[data.target.id]
                   local robot_to_block = vector3(-target_block.position_robot):rotate(target_block.orientation_robot:inverse())
                   local angle = math.atan(robot_to_block.y / robot_to_block.x) * 180 / math.pi
                   local blind_tolerance = 20

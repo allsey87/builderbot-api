@@ -57,23 +57,22 @@ return function(data)
             type = 'sequence*',
             children = {
                -- backup 8 cm
+               -- TODO: remove these hard coded values, use robot.api.parameters.constants
                robot.nodes.create_timer_node(
-                  {
-                     -- TODO remove the table
-                     time = 0.08 / 0.005,
-                     func = function()
-                        api.move(-0.005, -0.005)
-                     end
-                  }
+                  data,
+                  0.08 / 0.005,
+                  function()
+                     robot.api.move.with_velocity(-0.005, -0.005)
+                  end
                ),
                -- turn 180
+               -- TODO: remove these hard coded values, use robot.api.parameters.constants
                robot.nodes.create_timer_node(
-                  {
-                     time = 90 / 5,
-                     func = function()
-                        robot.api.move.with_bearing(0, 5)
-                     end
-                  }
+                  data,
+                  90 / 5,
+                  function()
+                     robot.api.move.with_bearing(0, 5)
+                  end
                )
             }
          }

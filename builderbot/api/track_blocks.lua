@@ -44,7 +44,8 @@ local function FindBlockXYZ(position, orientation) -- for camera
    dirs[highestI] = nil
 
    -- choose the one pointing nearest(min z) as X
-   local nearestI 
+   local nearestI
+   -- TODO math.huge? 
    local nearestZ = 99999999999
    for i, v in pairs(dirs) do
       if (position + v):length() < nearestZ then nearestZ = (position + v):length(); nearestI = i end
@@ -159,6 +160,7 @@ local function HungarianMatch(_oldBlocks, _newBlocks)
       end
    end
 
+   --TODO local hungarian = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
    local hun = Hungarian:create{costMat = penaltyMatrix, MAXorMIN = "MIN"}
    hun:aug()
    -- hun.match_of_X[i] is the index of match for oldBlocksArray[i]
@@ -205,7 +207,7 @@ function CheckTagDirection(block)
    end
 end
 
-function BlockTracking(_blocks, _tags)
+return function(_blocks, _tags)
    local blocks = {}
 
    -- cluster tags into blocks

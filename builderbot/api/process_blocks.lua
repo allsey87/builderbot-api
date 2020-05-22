@@ -3,18 +3,15 @@ if robot.logger then
 end
 
 return function(blocks)
-   if blocks == nil then
-      error("block table was nil")
-   end
    -- calculate the camera position
    local camera_position =
       robot.api.constants.end_effector_position_offset +
       robot.camera_system.transform.position +
       vector3(0, 0, robot.lift_system.position)
    -- track blocks
-   robot.hlapi.track_blocks(blocks, robot.camera_system.tags)
+   robot.api.track_blocks(blocks, robot.camera_system.tags)
    -- figure out led color for tags
-   robot.hlapi.process_leds()
+   robot.api.process_leds(blocks)
    -- cache the block's position and orientation in the robot's coordinate system
    for i, block in pairs(blocks) do
       block.position_robot =

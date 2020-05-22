@@ -2,7 +2,7 @@ if robot.logger then
    robot.logger.register_module("nodes.z_approach_block")
 end
 
-return function(target, distance)
+return function(data, distance)
    -- approach the target reference block until distance away 
    local location = {}
    return {
@@ -10,7 +10,7 @@ return function(target, distance)
       children = {
          -- calculate location
          function()
-            local target_block = api.blocks[target.reference_id]
+            local target_block = data.blocks[data.target.id]
             location.position = target_block.position_robot + 
                vector3(1,0,0):rotate(target_block.orientation_robot) * distance
             location.orientation = target_block.orientation_robot * quaternion(math.pi, vector3(0,0,1))
@@ -20,8 +20,8 @@ return function(target, distance)
          {
             type = "sequence",
             children = {
-               robot.nodes.create_obstacle_avoidance_node(),
-               robot.nodes.create_move_to_location_node(location),
+               robot.nodes.create_obstacle_avoidance_node(data),
+               robot.nodes.create_move_to_location_node(data, location),
             }
          }
       }, -- end of the children of go to pre-position
