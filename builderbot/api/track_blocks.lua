@@ -14,7 +14,7 @@ end
 --            ------- x
 --            |
 --            |y     in the camera's eye
-local function FindBlockXYZ(position, orientation) -- for camera
+local function find_block_xyz(position, orientation) -- for camera
    local X, Y, Z -- vectors of XYZ axis of a block (in camera's coor system) 
 
    -- all the 6 dirs of a block
@@ -35,30 +35,30 @@ local function FindBlockXYZ(position, orientation) -- for camera
    end
 
    -- choose the one pointing highest(min y) as Z 
-   local highestI 
-   local highestY = 0
+   local highest_i 
+   local highest_y = 0
    for i, v in pairs(dirs) do
-      if v.y < highestY then highestY = v.y highestI = i end
+      if v.y < highest_y then highest_y = v.y highest_i = i end
    end
-   Z = dirs[highestI]
-   dirs[highestI] = nil
+   Z = dirs[highest_i]
+   dirs[highest_i] = nil
 
    -- choose the one pointing nearest(min z) as X
-   local nearestI
+   local nearest_i
    -- TODO math.huge? 
-   local nearestZ = 99999999999
+   local nearest_z = 99999999999
    for i, v in pairs(dirs) do
-      if (position + v):length() < nearestZ then nearestZ = (position + v):length(); nearestI = i end
+      if (position + v):length() < nearest_z then nearest_z = (position + v):length(); nearest_i = i end
    end
-   X = dirs[nearestI]
-   dirs[nearestI] = nil
+   X = dirs[nearest_i]
+   dirs[nearest_i] = nil
 
    Y = vector3(Z):cross(X)
 
    return X, Y, Z  -- unit vectors
 end
 
-local function XYtoQuaternion(_orientation, _X, _Y)
+local function xy_to_quaternion(_orientation, _X, _Y)
    -- assume Z match
    -- from the XY to calculate the right quaternion
    local orientation = _orientation
@@ -79,7 +79,7 @@ local function XYtoQuaternion(_orientation, _X, _Y)
    end
 end
 
-local function XYZtoQuaternion(_orientation, _X, _Y, _Z)
+local function xyx_to_quaternion(_orientation, _X, _Y, _Z)
    -- from the XYZ to calculate the right quaternion
    local orientation = _orientation
    local x = vector3(1,0,0)
@@ -90,61 +90,61 @@ local function XYZtoQuaternion(_orientation, _X, _Y, _Z)
    z:rotate(orientation)
    if (z - _Z):length() < 0.2 then     
       -- z is up
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    elseif (-z - _Z):length() < 0.2 then     
       -- -z is up, rotate 180 along x
       orientation = orientation * quaternion(math.pi, vector3(1,0,0))
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    elseif (x - _Z):length() < 0.2 then     
       -- x is up, rotate a-clock 90 along y
       orientation = orientation * quaternion(math.pi/2, vector3(0,1,0))
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    elseif (-x - _Z):length() < 0.2 then     
       -- -x is up, rotate clock 90 along y
       orientation = orientation * quaternion(-math.pi/2, vector3(0,1,0))
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    elseif (y - _Z):length() < 0.2 then     
       -- y is up, rotate clock 90 along x
       orientation = orientation * quaternion(-math.pi/2, vector3(1,0,0))
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    elseif (-y - _Z):length() < 0.2 then     
       -- y is up, rotate a-clock 90 along x
       orientation = orientation * quaternion(math.pi/2, vector3(1,0,0))
-      return XYtoQuaternion(orientation, _X, _Y)
+      return xy_to_quaternion(orientation, _X, _Y)
    end
 end
 
-local function UpdateBlock(oldBlock, newBlock)
-   oldBlock.position = newBlock.position
-   oldBlock.orientation = newBlock.orientation
-   oldBlock.X = newBlock.X
-   oldBlock.Y = newBlock.Y
-   oldBlock.Z = newBlock.Z
-   oldBlock.tags = newBlock.tags
+local function update_block(old_block, new_block)
+   old_block.position = new_block.position
+   old_block.orientation = new_block.orientation
+   old_block.X = new_block.X
+   old_block.Y = new_block.Y
+   old_block.Z = new_block.Z
+   old_block.tags = new_block.tags
 end
 
-local function HungarianMatch(_oldBlocks, _newBlocks)
-   -- the index of _oldBlocks maybe not consistent, like 1, 2, 4, 6
+local function hungarian_match(_old_blocks, _new_blocks)
+   -- the index of _old_blocks maybe not consistent, like 1, 2, 4, 6
    -- put it into oldBlockArray with 1,2,3,4
-   local oldBlocksArray = {}
+   local old_block_array = {}
    local count = 0
-   for i, block in pairs(_oldBlocks) do
+   for i, block in pairs(_old_blocks) do
       count = count + 1
-      oldBlocksArray[count] = block
-      oldBlocksArray[count].index = i
+      old_block_array[count] = block
+      old_block_array[count].index = i
    end
 
    -- max size
-   local n = #oldBlocksArray
-   if #_newBlocks > n then n = #_newBlocks end
+   local n = #old_block_array
+   if #_new_blocks > n then n = #_new_blocks end
 
    -- set penalty matrix
       -- fill n * n with 0
-   local penaltyMatrix = {}
+   local penalty_matrix = {}
    for i = 1, n do 
-      penaltyMatrix[i] = {}
+      penalty_matrix[i] = {}
       for j = 1,n do 
-         penaltyMatrix[i][j] = 0
+         penalty_matrix[i][j] = 0
       end
    end
 
@@ -153,43 +153,44 @@ local function HungarianMatch(_oldBlocks, _newBlocks)
    -- old blocks  *             *
    --             * * * * * * * *
 
-   for i, oldB in ipairs(oldBlocksArray) do
-      for j, newB in ipairs(_newBlocks) do
-         local dis = (oldB.position - newB.position):length()
-         penaltyMatrix[i][j] = dis + 0.1   -- 0.1 to make it not 0
+   for i, old_block in ipairs(old_block_array) do
+      for j, new_block in ipairs(_new_blocks) do
+         local dis = (old_block.position - new_block.position):length()
+         penalty_matrix[i][j] = dis + 0.1   -- 0.1 to make it not 0
       end
    end
 
    --TODO local hungarian = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
-   local hun = Hungarian:create{costMat = penaltyMatrix, MAXorMIN = "MIN"}
+   --local hun = Hungarian:create{costMat = penalty_matrix, MAXorMIN = "MIN"}
+   local hun = robot.utils.hungarian:create{costMat = penalty_matrix, MAXorMIN = "MIN"}
    hun:aug()
-   -- hun.match_of_X[i] is the index of match for oldBlocksArray[i]
+   -- hun.match_of_X[i] is the index of match for old_block_array[i]
 
-   for i, oldB in ipairs(oldBlocksArray) do
-      if penaltyMatrix[i][hun.match_of_X[i]] == 0 then
+   for i, old_block in ipairs(old_block_array) do
+      if penalty_matrix[i][hun.match_of_X[i]] == 0 then
          -- lost
-         local index = oldB.index
-         _oldBlocks[index] = nil
+         local index = old_block.index
+         _old_blocks[index] = nil
       else
          -- tracking
-         local index = oldB.index
-         --_oldBlocks[index] = _newBlocks[hun.match_of_X[i]]
-         UpdateBlock(_oldBlocks[index], _newBlocks[hun.match_of_X[i]])
+         local index = old_block.index
+         --_old_blocks[index] = _new_blocks[hun.match_of_X[i]]
+         update_block(_old_blocks[index], _new_blocks[hun.match_of_X[i]])
       end
    end
 
    local index = 1
-   for j, newB in ipairs(_newBlocks) do
-      if penaltyMatrix[hun.match_of_Y[j]][j] == 0 then
+   for j, new_block in ipairs(_new_blocks) do
+      if penalty_matrix[hun.match_of_Y[j]][j] == 0 then
          -- new blocks
-         while _oldBlocks[index] ~= nil do index = index + 1 end
-         _oldBlocks[index] = newB
-         _oldBlocks[index].id = index
+         while _old_blocks[index] ~= nil do index = index + 1 end
+         _old_blocks[index] = new_block
+         _old_blocks[index].id = index
       end
    end
 end
 
-function CheckTagDirection(block)
+function check_tag_direction(block)
    for i, tag in ipairs(block.tags) do
       local dif = (tag.position - block.position) * (1/robot.api.constants.block_side_length) * 2
       if (block.X - dif):length() < 0.5 then
@@ -213,21 +214,21 @@ return function(_blocks, _tags)
    -- cluster tags into blocks
    local p = vector3(0, 0, -robot.api.constants.block_side_length/2)
    for i, tag in ipairs(_tags) do
-      local middlePointV3 = vector3(p):rotate(tag.orientation) + tag.position
+      local middle_point_v3 = vector3(p):rotate(tag.orientation) + tag.position
 
       -- find which block it belongs
       local flag = 0
       for j, block in ipairs(blocks) do
-         if (middlePointV3 - block.position):length() < robot.api.constants.block_side_length/3 then
+         if (middle_point_v3 - block.position):length() < robot.api.constants.block_side_length/3 then
             flag = 1
             block.tags[#block.tags + 1] = tag
-            block.positionSum = block.positionSum + middlePointV3
+            block.positionSum = block.positionSum + middle_point_v3
             break
          end
       end
       if flag == 0 then
-         blocks[#blocks + 1] = {position = middlePointV3, 
-                                positionSum = middlePointV3,
+         blocks[#blocks + 1] = {position = middle_point_v3, 
+                                positionSum = middle_point_v3,
                                 orientation = tag.orientation,
                                 tags = {tag},
                                }
@@ -240,13 +241,13 @@ return function(_blocks, _tags)
    end
    -- adjust block orientation
    for i, block in ipairs(blocks) do
-      block.X, block.Y, block.Z = FindBlockXYZ(block.position, block.orientation)
+      block.X, block.Y, block.Z = find_block_xyz(block.position, block.orientation)
          -- X,Y,Z are unit vectors
-      block.orientation = XYZtoQuaternion(block.orientation, block.X, block.Y, block.Z)
+      block.orientation = xyx_to_quaternion(block.orientation, block.X, block.Y, block.Z)
          -- to make orientation matches X,Y,Z
-      CheckTagDirection(block)
+      check_tag_direction(block)
    end
 
-   HungarianMatch(_blocks, blocks)
+   hungarian_match(_blocks, blocks)
 end
 
