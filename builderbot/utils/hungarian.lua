@@ -2,18 +2,6 @@ if robot.logger then
    robot.logger.register_module("utils.hungarian")
 end
 
--- TODO remove this function and use robot.utils.deep_copy()?
-local function copy(orig,n,m)
-   local copy = {}
-   for i = 1,n do
-      copy[i] = {}
-      for j = 1,m do
-         copy[i][j] = orig[i][j] or 0
-      end
-   end
-   return copy
-end
-
 -- get the size of a table, no matter square or not
 -- TODO: use snake_case
 local function getNM_Mat(Mat)
@@ -81,7 +69,16 @@ function Hungarian:create(configuration)
    -- Set costMat and size N
    --instance.costMat = deepcopy(configuration.costMat)
    local n,m = getNM_Mat(configuration.costMat)
-   instance.costMat = copy(configuration.costMat,n,m)
+   --instance.costMat = copy(configuration.costMat,n,m)
+   instance.costMat = robot.utils.shallow_copy(configuration.costMat)
+   -- nil check
+   for i = 1, n do
+      for j = 1, m do
+         if instance.costMat[i][j] == nil then
+            instance.costMat[i][j] = 0
+         end
+      end
+   end
 
    -- check and get N
    if n == -1 or m == -1 then
@@ -318,7 +315,7 @@ function Hungarian:aug()
       self:aug()
    end
 
-   -- if it comes here, that means all the possibility is tried and no other edges can be add,
+   -- if it comes here, that means all the possibility is tried and no other edges can be added,
    -- then it is the end, match table is what we got
 end   --end of function aug
 
