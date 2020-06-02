@@ -10,7 +10,8 @@ return function()
       children = {
          function()
             -- TODO use robot.random!
-            local random_angle = math.random(-robot.api.parameters.search_random_range, robot.api.parameters.search_random_range)
+            --local random_angle = math.random(-robot.api.parameters.search_random_range, robot.api.parameters.search_random_range)
+            local random_angle = robot.random(-robot.api.parameters.search_random_range, robot.api.parameters.search_random_range)
             --robot.api.move(-robot.api.parameters.default_speed, robot.api.parameters.default_speed)
             robot.api.move.with_bearing(robot.api.parameters.default_speed, random_angle)
             return true
