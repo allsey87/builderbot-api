@@ -4,7 +4,7 @@ end
 
 function deep_copy(item)
    if type(item) == 'table' then
-      table = {}
+      local table = {}
       for key, value in next, item, nil do
          table[deep_copy(key)] = deep_copy(value)
       end

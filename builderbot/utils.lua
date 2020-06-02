@@ -3,6 +3,8 @@ return {
       require('utils.behavior_tree'),
    deep_copy =
       require('utils.deep_copy'),
+   shallow_copy =
+      require('utils.shallow_copy'),
    draw =
       require('utils.draw'),    
    hungarian =
