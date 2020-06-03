@@ -11,6 +11,4 @@ return {
       require('utils.hungarian'),
    queue =
       require('utils.queue'),
-   show_table =
-      require('utils.show_table'),
 }

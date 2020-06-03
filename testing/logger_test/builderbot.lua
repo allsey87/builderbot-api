@@ -1,3 +1,5 @@
+package.path = package.path .. ";builderbot/?.lua"
+
 function init()
    --[[ load modules ]]--
    -- TODO add verbosity control to logger
@@ -6,45 +8,32 @@ function init()
    robot.utils = require('utils')
    robot.api = require('api')
    robot.nodes = require('nodes')
+
+   logger_test = require("logger_test")
+
+   robot.logger.enable()
+   robot.logger.enable("logger_test")
+   robot.logger.disable("nil")
+   
+   --robot.logger.set_level("ERR")
+   --robot.logger.set_level("WARN")
+   robot.logger.set_level("INFO")
+   --robot.logger.set_level("non_sense")
+
    --[[ initialize shared data ]]--
    data = {
-      target = {
-         id = 1,
-         offset = vector3(0,0,0),
-         color = "green",
-      },
       blocks = {}
    }
-   --[[ configure and initialize behavior tree ]]--
-   local top_level_node = {
-      type = 'sequence*',
-      children = {
-         robot.nodes.create_pickup_block_node(data, 0.15),
-         -- update the target data
-         function() 
-            data.target.offset = vector3(0,0,1) 
-            data.target.color = "pink"
-            return false, true 
-         end,
-         robot.nodes.create_place_block_node(
-            data,
-            0.15 + robot.api.constants.end_effector_position_offset.x),
-          -- stop
-          function() robot.api.move.with_velocity(0,0) return true end,
-       },
-    }
-    -- generate the behavior tree
-    robot.behavior = 
-      robot.utils.behavior_tree.create(top_level_node)
-    -- enable the robot's camera
-    robot.camera_system.enable()
 end
 
 function step()
-   robot.logger('[step: clock = ]')
-   robot.api.process_blocks(data.blocks)
-   robot.api.process_obstacles()
-   robot.behavior()
+   robot.logger("INFO", '[step: clock = ]')
+   robot.logger("ERR", 'something is wrong')
+   robot.logger("WARN", 'something is suspicious')
+   robot.logger("NON_SENSE", 'nonsense')
+   --robot.api.process_blocks(data.blocks)
+
+   logger_test()
 end
 
 function reset()
@@ -55,5 +44,4 @@ end
 
 function destroy()
    -- disable the robot's camera
-   robot.camera_system.disable()
 end

@@ -3,12 +3,23 @@ logger.mt = {}
 setmetatable(logger, logger.mt)
 
 -- call logger(...)
-function logger.mt:__call(a, ...)
+function logger.mt:__call(level_str, a, ...)
+   -- get module name
 	local info = debug.getinfo(2)
    local src = info.short_src
    local moduleName = logger.modules[src]
    if moduleName == nil then moduleName = "nil" end
-   if logger.switches[moduleName] == true then
+   -- get level 
+   local level = 0
+   if level_str == "ERR" then level = 0
+   elseif level_str == "WARN" then level = 1
+   elseif level_str == "INFO" then level = 2
+   else logger("WARN", modulename, "logger level is not specified correctly")
+   end
+
+   -- print info
+   if logger.switches[moduleName] == true and
+      level <= logger.verbosity_level then
       --print("logger:\t" .. moduleName .. ":" .. info.currentline .. "\t", ...)
       if type(a) == "table" then
          logger.show_table(a, ...)
@@ -18,6 +29,20 @@ function logger.mt:__call(a, ...)
    end
 end
 
+function logger.set_level(level_str)
+   logger.verbosity_level = 0
+   if level_str == "ERR" then 
+      logger.verbosity_level = 0
+   elseif level_str == "WARN" then 
+      logger.verbosity_level = 1
+   elseif level_str == "INFO" then 
+      logger.verbosity_level = 2
+   else 
+      logger("ERR", "logger level is not set correctly")
+   end
+end
+
+logger.verbosity_level = 0 -- 0 is ERR
 logger.modules = {}
 logger.switches = {}
 logger.switches["nil"] = false
