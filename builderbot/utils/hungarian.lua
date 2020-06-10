@@ -37,99 +37,8 @@ end
    -- for the algorithm, please refer to: 
    -- https://www.topcoder.com/community/data-science/data-science-tutorials/assignment-problem-and-hungarian-algorithm/
 
-local Hungarian = 
-{
-   -- a Hungarian should have these data
-   costMat = {},
-   N = 0,
-   -- M = 0
-      -- no M currently, consider only square
-
-   maxMatch = 0,
-   match_of_X = nil,
-   match_of_Y = nil,
-}
-Hungarian.__index = Hungarian
-
-function Hungarian:create(configuration)
-   --Inherite
-   local instance = {}
-   setmetatable(instance,self)
-   self.__index = self
-      --the metatable of instance would be whoever owns this create
-      --so you can :  a = Hungarian:create();  b = a:create();  grandfather-father-son
-
-   --Asserts
-      -- to be filled
-      -- check in the following body
-      -- maybe not square
-      -- maybe the square lacks a corner (this matters, should fill in with 0, cannot be nil)
-         -- with copy rather than deepcopy, can be nil
-   
-   -- Set costMat and size N
-   --instance.costMat = deepcopy(configuration.costMat)
-   local n,m = getNM_Mat(configuration.costMat)
-   --instance.costMat = copy(configuration.costMat,n,m)
-   instance.costMat = robot.utils.shallow_copy(configuration.costMat)
-   -- nil check
-   for i = 1, n do
-      for j = 1, m do
-         if instance.costMat[i][j] == nil then
-            instance.costMat[i][j] = 0
-         end
-      end
-   end
-
-   -- check and get N
-   if n == -1 or m == -1 then
-      robot.logger("invalid costMat")
-      return nil
-   end
-   if n ~= m then
-      robot.logger("non square")
-      -- to be filled
-      return nil
-         -- temporarily
-   end
-   instance.N = n
-
-   ---------------- min or max problem ----------------
-   -- TODO: use a boolean for this
-   if configuration.MAXorMIN == "MIN" then
-      for i = 1,n do
-         for j = 1,n do
-            instance.costMat[i][j] = -instance.costMat[i][j] 
-         end
-      end
-   end
-   ----------------------------------------------------
-
-   -- Set labels and maxMatch
-   instance.maxMatch = 0
-   instance.match_of_X = {}
-   instance.match_of_Y = {}
-
-   --init lx,ly, which are the value labels of X and Y
-   instance.lx = {}; instance.ly = {}
-   --local i,j -- in lua this is not necessary, the i in for is local to for
-   for i = 1,n do instance.ly[i] = 0 end
-      --label of Y is all 0
-   -- TODO: math.huge   
-   for i = 1,n do instance.lx[i] = instance.costMat[1][1] - 99999999999 end  -- set to -INF
-      --lx is the max of his cost edges      -- for max problem
-   for i = 1,n do 
-      for j = 1,n do
-         if instance.lx[i] < instance.costMat[i][j] then
-            instance.lx[i] = instance.costMat[i][j]
-         end
-      end
-   end
-
-   return instance
-end
-
 ------------------------------------------------------------------------------------------
-function Hungarian:update_labels()
+local function update_labels(self)
    local N = self.N
    local slack = self.slack
    local slackx = self.slackx
@@ -161,7 +70,7 @@ function Hungarian:update_labels()
    end
 end
 
-function Hungarian:add_to_tree(x,its_parent)
+local function add_to_tree(self, x, its_parent)
    self.S[x] = true
    self.parent_table[x] = its_parent
    
@@ -173,9 +82,9 @@ function Hungarian:add_to_tree(x,its_parent)
       end
    end
 end
----The Augment-------------------------------------------------------------------------------
 
-function Hungarian:aug()
+---The Augment-------------------------------------------------------------------------------
+local function aug_function(self)
    --[[
       for someone not be matched in X:
          1. try to find all his augmenting tree, 
@@ -319,5 +228,91 @@ function Hungarian:aug()
    -- then it is the end, match table is what we got
 end   --end of function aug
 
-return Hungarian
+----------------------------------------------------------------------------------
+local function create_function(configuration)
+   -- configuration should be {costMat = penalty_matrix, MAXorMIN = "MIN"}
+   local instance = {
+      -- a Hungarian should have these data
+      costMat = {},
+      N = 0,
+      -- M = 0
+         -- no M currently, consider only square
+      maxMatch = 0,
+      match_of_X = nil,
+      match_of_Y = nil,
+
+      aug = aug_function,
+   }
+
+   -- Set costMat and size N
+   --instance.costMat = deepcopy(configuration.costMat)
+   local n,m = getNM_Mat(configuration.costMat)
+   --instance.costMat = copy(configuration.costMat,n,m)
+   instance.costMat = robot.utils.shallow_copy(configuration.costMat)
+
+   --Asserts
+      -- to be filled
+      -- check in the following body
+      -- maybe not square
+
+   -- nil check
+   for i = 1, n do
+      for j = 1, m do
+         if instance.costMat[i][j] == nil then
+            instance.costMat[i][j] = 0
+         end
+      end
+   end
+
+   -- check and get N
+   if n == -1 or m == -1 then
+      robot.logger("invalid costMat")
+      return nil
+   end
+   if n ~= m then
+      robot.logger("non square")
+      -- to be filled
+      return nil
+         -- temporarily
+   end
+   instance.N = n
+
+   ---------------- min or max problem ----------------
+   -- TODO: use a boolean for this
+   if configuration.MAXorMIN == "MIN" then
+      for i = 1,n do
+         for j = 1,n do
+            instance.costMat[i][j] = -instance.costMat[i][j] 
+         end
+      end
+   end
+   ----------------------------------------------------
+
+   -- Set labels and maxMatch
+   instance.maxMatch = 0
+   instance.match_of_X = {}
+   instance.match_of_Y = {}
+
+   --init lx,ly, which are the value labels of X and Y
+   instance.lx = {}; instance.ly = {}
+   --local i,j -- in lua this is not necessary, the i in for is local to for
+   for i = 1,n do instance.ly[i] = 0 end
+      --label of Y is all 0
+   -- TODO: math.huge   
+   for i = 1,n do instance.lx[i] = instance.costMat[1][1] - 99999999999 end  -- set to -INF
+      --lx is the max of his cost edges      -- for max problem
+   for i = 1,n do 
+      for j = 1,n do
+         if instance.lx[i] < instance.costMat[i][j] then
+            instance.lx[i] = instance.costMat[i][j]
+         end
+      end
+   end
+
+   return instance
+end
+
+return {
+   create = create_function
+}
 
