@@ -20,7 +20,7 @@ end
 
 function step()
    robot.logger("INFO", '[reset: clock = ]')
-   hungarian = robot.utils.hungarian.create{
+   local hungarian = robot.utils.hungarian.create{
       costMat = {
          {2, 1},
          {1, 2},

@@ -162,7 +162,7 @@ local function hungarian_match(_old_blocks, _new_blocks)
 
    --TODO local hungarian = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
    --local hun = Hungarian:create{costMat = penalty_matrix, MAXorMIN = "MIN"}
-   local hun = robot.utils.hungarian:create{costMat = penalty_matrix, MAXorMIN = "MIN"}
+   local hun = robot.utils.hungarian.create{costMat = penalty_matrix, MAXorMIN = "MIN"}
    hun:aug()
    -- hun.match_of_X[i] is the index of match for old_block_array[i]
 
@@ -234,6 +234,7 @@ return function(_blocks, _tags)
                                }
       end
    end
+
    -- average block position
    for i, block in ipairs(blocks) do
       block.position = block.positionSum * (1/#block.tags)
@@ -247,6 +248,8 @@ return function(_blocks, _tags)
          -- to make orientation matches X,Y,Z
       check_tag_direction(block)
    end
+
+   robot.logger("INFO", blocks)
 
    hungarian_match(_blocks, blocks)
 end
