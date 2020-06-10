@@ -94,7 +94,7 @@ function logger.show_table(table, number, skipindex)
       else
          if type(v) == "table" then
             print(str)
-            DebugMessage.ShowTable(v, number + 1, skipindex)
+            logger.show_table(v, number + 1, skipindex)
          else
             str = str .. tostring(v)
             print(str)
