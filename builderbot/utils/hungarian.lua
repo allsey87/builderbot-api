@@ -39,6 +39,7 @@ end
 
 ------------------------------------------------------------------------------------------
 local function update_labels(self)
+   robot.logger("INFO", "I am update")
    local N = self.N
    local slack = self.slack
    local slackx = self.slackx
@@ -71,6 +72,7 @@ local function update_labels(self)
 end
 
 local function add_to_tree(self, x, its_parent)
+   robot.logger("INFO", "I am add to tree")
    self.S[x] = true
    self.parent_table[x] = its_parent
    
@@ -85,6 +87,7 @@ end
 
 ---The Augment-------------------------------------------------------------------------------
 local function aug_function(self)
+   robot.logger("INFO", "I am aug")
    --[[
       for someone not be matched in X:
          1. try to find all his augmenting tree, 
@@ -166,7 +169,7 @@ local function aug_function(self)
                T[y] = true
                queue:push(self.match_of_Y[y])
                --S[x] = true   -- this is done in add_to_tree
-               self:add_to_tree(self.match_of_Y[y],x)
+               add_to_tree(self, self.match_of_Y[y],x)
             end
          end   -- end of for y
 
@@ -181,7 +184,7 @@ local function aug_function(self)
          --             tree is built
          --          need to change label next
       
-      self:update_labels()
+      update_labels(self)
    
       queue = robot.utils.queue.create()
       flag = 0
