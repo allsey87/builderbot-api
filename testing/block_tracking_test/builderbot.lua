@@ -24,6 +24,9 @@ end
 function step()
    robot.logger("INFO", '[reset: clock = ]lalalalala')
    robot.api.process_blocks(data.blocks)
+   -- figure out led color for tags
+   robot.api.process_leds(data.blocks)
+   robot.logger("INFO", data.blocks)
 end
 
 function reset()

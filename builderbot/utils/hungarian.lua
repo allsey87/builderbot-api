@@ -39,7 +39,6 @@ end
 
 ------------------------------------------------------------------------------------------
 local function update_labels(self)
-   robot.logger("INFO", "I am update")
    local N = self.N
    local slack = self.slack
    local slackx = self.slackx
@@ -72,7 +71,6 @@ local function update_labels(self)
 end
 
 local function add_to_tree(self, x, its_parent)
-   robot.logger("INFO", "I am add to tree")
    self.S[x] = true
    self.parent_table[x] = its_parent
    
@@ -87,7 +85,6 @@ end
 
 ---The Augment-------------------------------------------------------------------------------
 local function aug_function(self)
-   robot.logger("INFO", "I am aug")
    --[[
       for someone not be matched in X:
          1. try to find all his augmenting tree, 
@@ -232,8 +229,8 @@ local function aug_function(self)
 end   --end of function aug
 
 ----------------------------------------------------------------------------------
-local function create_function(configuration)
-   -- configuration should be {costMat = penalty_matrix, MAXorMIN = "MIN"}
+--local function create_function(configuration)
+local function create_function(cost_mat, is_it_max_problem)
    local instance = {
       -- a Hungarian should have these data
       costMat = {},
@@ -248,10 +245,8 @@ local function create_function(configuration)
    }
 
    -- Set costMat and size N
-   --instance.costMat = deepcopy(configuration.costMat)
-   local n,m = getNM_Mat(configuration.costMat)
-   --instance.costMat = copy(configuration.costMat,n,m)
-   instance.costMat = robot.utils.shallow_copy(configuration.costMat)
+   local n,m = getNM_Mat(cost_mat)
+   instance.costMat = robot.utils.shallow_copy(cost_mat)
 
    --Asserts
       -- to be filled
@@ -269,11 +264,11 @@ local function create_function(configuration)
 
    -- check and get N
    if n == -1 or m == -1 then
-      robot.logger("invalid costMat")
+      robot.logger("ERR", "hungarian, invalid costMat")
       return nil
    end
    if n ~= m then
-      robot.logger("non square")
+      robot.logger("ERR", "hungarian, costMat is not square")
       -- to be filled
       return nil
          -- temporarily
@@ -281,8 +276,7 @@ local function create_function(configuration)
    instance.N = n
 
    ---------------- min or max problem ----------------
-   -- TODO: use a boolean for this
-   if configuration.MAXorMIN == "MIN" then
+   if is_it_max_problem == false then
       for i = 1,n do
          for j = 1,n do
             instance.costMat[i][j] = -instance.costMat[i][j] 
@@ -298,7 +292,6 @@ local function create_function(configuration)
 
    --init lx,ly, which are the value labels of X and Y
    instance.lx = {}; instance.ly = {}
-   --local i,j -- in lua this is not necessary, the i in for is local to for
    for i = 1,n do instance.ly[i] = 0 end
       --label of Y is all 0
    -- TODO: math.huge   

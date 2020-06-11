@@ -2,9 +2,6 @@ if robot.logger then
    robot.logger.register_module("api.process_leds")
 end
 
--- TODO move to robot.api.constants
--- distance between leds to the center
-
 return function(blocks)
    -- takes tags in camera_frame_reference
    for i, block in ipairs(blocks) do

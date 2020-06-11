@@ -53,7 +53,7 @@
       <sensors>
         <radios implementation="default" show_rays="true"/>
       </sensors>
-      <params script="block.lua" />
+      <params script="testing/block_tracking_test/block.lua" />
     </lua_controller>
   </controllers>
 

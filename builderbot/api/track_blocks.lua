@@ -16,7 +16,6 @@ end
 --            |y     in the camera's eye
 local function find_block_xyz(position, orientation) -- for camera
    local X, Y, Z -- vectors of XYZ axis of a block (in camera's coor system) 
-
    -- all the 6 dirs of a block
    local dirs = {}
    dirs[1] = vector3(1,0,0)
@@ -160,9 +159,7 @@ local function hungarian_match(_old_blocks, _new_blocks)
       end
    end
 
-   --TODO local hungarian = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
-   --local hun = Hungarian:create{costMat = penalty_matrix, MAXorMIN = "MIN"}
-   local hun = robot.utils.hungarian.create{costMat = penalty_matrix, MAXorMIN = "MIN"}
+   local hun = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
    hun:aug()
    -- hun.match_of_X[i] is the index of match for old_block_array[i]
 
@@ -248,8 +245,6 @@ return function(_blocks, _tags)
          -- to make orientation matches X,Y,Z
       check_tag_direction(block)
    end
-
-   robot.logger("INFO", blocks)
 
    hungarian_match(_blocks, blocks)
 end
