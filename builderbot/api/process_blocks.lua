@@ -9,19 +9,15 @@ return function(blocks)
       robot.camera_system.transform.position +
       vector3(0, 0, robot.lift_system.position)
    -- track blocks
-   robot.logger("INFO", "B")
    robot.api.track_blocks(blocks, robot.camera_system.tags)
-   robot.logger("INFO", "C")
    -- figure out led color for tags
    robot.api.process_leds(blocks)
-   robot.logger("INFO", "D")
    -- cache the block's position and orientation in the robot's coordinate system
    for i, block in pairs(blocks) do
       block.position_robot =
          vector3(block.position):rotate(robot.camera_system.transform.orientation) + camera_position
       block.orientation_robot = robot.camera_system.transform.orientation * block.orientation
    end
-   robot.logger("INFO", "E")
 end
 
 
