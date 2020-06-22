@@ -1,9 +1,9 @@
 package.path = package.path .. ";builderbot/?.lua"
 
+local bt
+
 function init()
    --[[ load modules ]]--
-   -- TODO add verbosity control to logger
-   -- TODO logger always prints "MODULE_NAME: MESSAGE"
    robot.logger = require('logger')
    robot.utils = require('utils')
    robot.api = require('api')
@@ -13,10 +13,14 @@ function init()
    robot.logger.set_level("INFO")
    
    --[[ initialize shared data ]]--
-   -- TODO: share data with robot?
    data = {
-      blocks = {},
-      obstacles = {},
+      blocks = {}
+   }
+
+   bt = robot.utils.behavior_tree.create{
+      type = "sequence*", children = {
+         robot.nodes.create_random_walk_node()
+      }
    }
 
    -- enable the robot's camera
@@ -24,12 +28,8 @@ function init()
 end
 
 function step()
-   robot.logger("INFO", '[reset: clock = ]lalalalala')
-   robot.api.process_blocks(data.blocks)
-   -- figure out led color for tags
-   robot.api.process_leds(data.blocks)
-   robot.api.process_obstacles(data.obstacles, data.blocks)
-   robot.logger("INFO", data)
+   robot.logger("INFO", '[reset: clock = ]')
+   bt()
 end
 
 function reset()

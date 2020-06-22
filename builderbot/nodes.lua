@@ -7,7 +7,7 @@ return {
       require("nodes.z_approach_block"),
    create_curved_approach_block_node =
       require("nodes.curved_approach_block"),
-   create_pickup_block_node =
+   create_pick_up_block_node =
       require('nodes.pick_up_block'),
    create_place_block_node =
       require('nodes.place_block'),

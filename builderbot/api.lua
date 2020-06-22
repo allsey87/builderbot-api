@@ -1,6 +1,7 @@
 return {
    --[[ initialize constants ]]--
    constants = {
+      time_period = 0.2, --TODO : measure
       block_side_length = 0.055,
       -- from x+, counter-closewise
       block_led_offset_from_tag = {
@@ -13,10 +14,6 @@ return {
       lift_system_upper_limit = 0.135,
       lift_system_lower_limit = 0,
       end_effector_position_offset = vector3(0.09800875, 0, 0.055),
-      -- TODO make these parameters
-      lift_system_rf_cover_threshold = 0.06,
-      lift_system_position_tolerance = 0.001,
-
    },
    --[[ initialize parameters ]]--
    parameters = {
@@ -34,6 +31,10 @@ return {
          tonumber(robot.params.proximity_detect_tolerance or 0.03),
       proximity_maximum_distance =
          tonumber(robot.params.proximity_maximum_distance or 0.05),
+      lift_system_rf_cover_threshold =
+         tonumber(robot.params.lift_system_rf_cover_threshold or 0.06),
+      lift_system_position_tolerance =
+         tonumber(robot.params.lift_system_position_tolerance or 0.001),
    },
    --[[ initialize submodules ]]--
    match_rules =

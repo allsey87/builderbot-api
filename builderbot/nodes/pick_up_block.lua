@@ -21,7 +21,6 @@ return function(data, forward_distance)
             children = {
                -- hand full ?
                function()
-                  robot.logger('check full')
                   if robot.rangefinders['underneath'].proximity < robot.api.parameters.proximity_touch_tolerance then
                      return false, true -- not running, true
                   else
@@ -30,7 +29,6 @@ return function(data, forward_distance)
                end,
                -- low lift
                function()
-                  robot.logger('set down')
                   robot.lift_system.set_position(0)
                   return true
                end
@@ -48,7 +46,6 @@ return function(data, forward_distance)
                robot.nodes.create_timer_node(data, 2),
                -- raise
                function()
-                  robot.logger('raising')
                   robot.lift_system.set_position(robot.lift_system.position + 0.05)
                   return false, true -- not running, true
                end,
@@ -63,6 +60,7 @@ return function(data, forward_distance)
          robot.nodes.create_timer_node(data, 2),
          function()
             if robot.rangefinders['underneath'].proximity < robot.api.parameters.proximity_touch_tolerance then
+               robot.logger("INFO", "pick_up_block: pick up success")
                return false, true -- not running, true
             else
                return false, false -- not running, false

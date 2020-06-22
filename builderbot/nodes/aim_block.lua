@@ -27,16 +27,14 @@ return function(data, aim_point)
 
             local tolerance = robot.api.parameters.lift_system_position_tolerance
             local target_height = robot.lift_system.position - target_tag.position.y -- TODO: refine this calculation
-            local upper_limit = robot.api.parameters.lift_system_upper_limit
-            local lower_limit = robot.api.parameters.lift_system_lower_limit + target_block.position_robot.z - 0.02
+            local upper_limit = robot.api.constants.lift_system_upper_limit
+            local lower_limit = robot.api.constants.lift_system_lower_limit + target_block.position_robot.z - 0.02
             if target_height < lower_limit then target_height = lower_limit end
             if target_height > upper_limit then target_height = upper_limit end
             if robot.lift_system.position > target_height - tolerance and 
                robot.lift_system.position < target_height + tolerance then
-               robot.logger("camera in position")
                flag_camera = true
             else
-               robot.logger("camera not in position")
                robot.lift_system.set_position(target_height)
                flag_camera = false
             end
@@ -78,7 +76,6 @@ return function(data, aim_point)
                   flag_orientation = false
                else
                   turn = "no"
-                  robot.logger("robot in right orientation")
                   flag_orientation = true
                end
             end

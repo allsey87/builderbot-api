@@ -13,20 +13,18 @@ return function(data, rule_node)
             children = {
                -- if lift reach position(0.07), return true, stop selector
                function()
-                  if (robot.lift_system.position > robot.api.parameters.lift_system_upper_limit - 
+                  if (robot.lift_system.position > robot.api.constants.lift_system_upper_limit - 
                         robot.api.parameters.lift_system_position_tolerance) and
-                     (robot.lift_system.position < robot.api.parameters.lift_system_upper_limit +
+                     (robot.lift_system.position < robot.api.constants.lift_system_upper_limit +
                         robot.api.parameters.lift_system_position_tolerance) then
-                     robot.logger("search_in position")
                      return false, true
                   else
-                     robot.logger("search_not in position")
                      return false, false
                   end
                end,
                -- set position(0.07)
                function()
-                  robot.lift_system.set_position(robot.api.parameters.lift_system_upper_limit)
+                  robot.lift_system.set_position(robot.api.constants.lift_system_upper_limit)
                   return true -- always running
                end,
             },
@@ -40,13 +38,12 @@ return function(data, rule_node)
                   type = "sequence",
                   children = {
                      -- if obstacle and avoid
-                     robot.nodes.create_obstacle_avoidance_node(),
+                     robot.nodes.create_obstacle_avoidance_node(data),
                      -- obstacle clear, random walk
                      function()
                         -- TODO use robot.random
                         local random_angle =
-                           robot.random(-robot.api.parameters.search_random_range,
-                           --math.random(-robot.api.parameters.search_random_range,
+                           robot.random.uniform(-robot.api.parameters.search_random_range,
                                         robot.api.parameters.search_random_range)
                         --robot.api.move(-robot.api.parameters.default_speed, robot.api.parameters.default_speed)
                         robot.api.move.with_bearing(robot.api.parameters.default_speed,
@@ -58,6 +55,9 @@ return function(data, rule_node)
                -- choose a block,
                -- if got one, return true, stop sequence
                rule_node,
+               function()
+                  robot.logger("INFO", "search: rule node match, got a target")
+               end
             },
          },
       },

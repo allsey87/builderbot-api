@@ -14,12 +14,10 @@ return function(data, target_distance)
          -- check the target block is still there 
          function()
             if data.target.id == nil or data.blocks[data.target.id] == nil then
-               robot.logger("block is nil")
+               robot.logger("INFO", "curved_approach_block: target block is nil")
                robot.api.move.with_velocity(0,0)
                return false, false
             else
-               -- TODO is this message necessary?
-               robot.logger("block is not nil")
                return false, true
             end
          end,
@@ -28,7 +26,6 @@ return function(data, target_distance)
             local target_block = data.blocks[data.target.id]
             local robot_to_block = vector3(-target_block.position_robot):rotate(target_block.orientation_robot:inverse())
             local angle = math.atan(robot_to_block.y / robot_to_block.x) * 180 / math.pi
-            robot.logger("angle is ", angle)
             local tolerance = robot.api.parameters.aim_block_angle_tolerance * 3
 
             if angle > 40 or angle < -40 then return false, false end
@@ -70,8 +67,6 @@ return function(data, target_distance)
             local tolerence = robot.api.parameters.block_position_tolerance
             local default_speed = robot.api.parameters.default_speed
 
-            robot.logger(case)
-
             if case.forward_backup_case == 1 then
                -- forward case
                --if target_block.position_robot.x > target_distance - tolerence then
@@ -83,6 +78,7 @@ return function(data, target_distance)
                   -- close enough, check angle
                   if case.left_right_case == 0 then
                      -- success
+                     robot.logger("INFO", "curved_approach_block: approach success")
                      return false, true
                   else
                      -- close enough, but wrong angle, switch to backup
