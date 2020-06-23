@@ -18,27 +18,41 @@ function init()
       obstacles = {},
    }
 
+   local create_rule_node = function(pickup_or_place)
+      -- consider the first block in the array as target
+      return function()
+         for i = 1, 10 do
+            if data.blocks[i] ~= nil then
+               robot.logger("INFO", "rule_node: got a block, id = ", i)
+               data.target = {
+                  id = i,
+                  offset = vector3(),
+               }
+               if pickup_or_place == "place" then
+                  data.target.offset = vector3(0,0,1)
+               end
+               return false, true
+            end
+         end
+         return false, false
+      end
+   end
+
    bt = robot.utils.behavior_tree.create{
       type = "sequence*", children = {
          robot.nodes.create_search_block_node(data, 
-            -- consider the first block as target
-            function ()
-               if data.blocks[1] ~= nil then
-                  robot.logger("INFO", "rule_node: got blocks[1]")
-                  data.target = {
-                     id = 1,
-                     offset = vector3(),
-                  }
-                  return false, true
-               else
-                  return false, false
-               end
-            end
+            create_rule_node("pickup")
          ),
          robot.nodes.create_curved_approach_block_node(data, 0.20),
          robot.nodes.create_pick_up_block_node(data, 0.20),
+
+         robot.nodes.create_search_block_node(data, 
+            create_rule_node("place")
+         ),
+         robot.nodes.create_curved_approach_block_node(data, 0.20),
+         robot.nodes.create_place_block_node(data, 0.20),
          function ()
-            robot.logger("INFO", "pick up ended")
+            robot.logger("INFO", "pick up and place finish")
             return false, true
          end,
          function ()
