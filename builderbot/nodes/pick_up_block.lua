@@ -43,7 +43,7 @@ return function(data, forward_distance)
                   robot.electromagnet_system.set_discharge_mode('constructive')
                end,
                -- wait for 2 sec
-               robot.nodes.create_timer_node(data, 2),
+               robot.nodes.create_timer_node(2),
                -- raise
                function()
                   robot.lift_system.set_position(robot.lift_system.position + 0.05)
@@ -57,7 +57,7 @@ return function(data, forward_distance)
          },
          -- check success
          -- wait
-         robot.nodes.create_timer_node(data, 2),
+         robot.nodes.create_timer_node(2),
          function()
             if robot.rangefinders['underneath'].proximity < robot.api.parameters.proximity_touch_tolerance then
                robot.logger("INFO", "pick_up_block: pick up success")

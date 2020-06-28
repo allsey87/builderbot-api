@@ -112,16 +112,16 @@ return function(data, location)
          -- TODO is it necessary to repeatedly call xxx_timer_parameter.func via the timer node? Is once not sufficient?
          -- turn th
          function() robot.logger("turn th") return false, true end,
-         robot.nodes.create_timer_node(data, turn_th_timer_parameter.time, turn_th_timer_parameter.func),
-         --TODO: see above: robot.nodes.create_timer_node(data, calculate_th(distance)),
+         robot.nodes.create_timer_node(turn_th_timer_parameter.time, turn_th_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(calculate_th(distance)),
          -- move dis
          function() robot.logger("move dis") return false, true end,
-         robot.nodes.create_timer_node(data, move_dis_timer_parameter.time, move_dis_timer_parameter.func),
-         --TODO: see above: robot.nodes.create_timer_node(data, calculate_dis(distance)),
+         robot.nodes.create_timer_node(move_dis_timer_parameter.time, move_dis_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(calculate_dis(distance)),
          -- turn th2
          function() robot.logger("turn th2") return false, true end,
-         robot.nodes.create_timer_node(data, turn_th2_timer_parameter.time, turn_th2_timer_parameter.func),
-         --TODO: see above: robot.nodes.create_timer_node(data, calculate_th2(distance)),
+         robot.nodes.create_timer_node(turn_th2_timer_parameter.time, turn_th2_timer_parameter.func),
+         --TODO: see above: robot.nodes.create_timer_node(calculate_th2(distance)),
          -- stop moving
          function() 
             robot.api.move.with_velocity(0,0)

@@ -51,7 +51,6 @@ return function(data)
                -- backup 8 cm
                -- TODO: remove these hard coded values, use robot.api.parameters.constants
                robot.nodes.create_timer_node(
-                  data,
                   0.08 / robot.api.parameters.default_speed,
                   function()
                      robot.api.move.with_velocity(-robot.api.parameters.default_speed, 
@@ -61,7 +60,6 @@ return function(data)
                -- turn 180
                -- TODO: remove these hard coded values, use robot.api.parameters.constants
                robot.nodes.create_timer_node(
-                  data,
                   90 / 5,
                   function()
                      robot.api.move.with_bearing(0, 5)

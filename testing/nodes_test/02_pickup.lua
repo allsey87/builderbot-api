@@ -51,7 +51,15 @@ function init()
          ),
          robot.nodes.create_curved_approach_block_node(data, 0.20),
          robot.nodes.create_place_block_node(data, 0.20),
+         robot.nodes.create_timer_node(
+            0.1/robot.api.parameters.default_speed,
+            function()
+               robot.api.move.with_velocity(-robot.api.parameters.default_speed, 
+                                            -robot.api.parameters.default_speed)
+            end
+         ),
          function ()
+            robot.api.move.with_velocity(0,0) 
             robot.logger("INFO", "pick up and place finish")
             return false, true
          end,
@@ -66,7 +74,7 @@ function init()
 end
 
 function step()
-   --robot.logger("INFO", '----- step -----')
+   robot.logger("INFO", '----- step -----')
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
