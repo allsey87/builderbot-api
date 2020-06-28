@@ -4,10 +4,11 @@ end
 
 function check_block_in_safe_zone(block)
    -- we use block in camera eye provided by blocktrackig (Probably would have to do the conversion here in the future)
+   -- TODO local?
    x = block.position.x
    y = block.position.y
    z = block.position.z
-   -- Define camera parameters (probably this is already provided by michael or maybe ask for it)
+   -- TODO Define camera parameters (probably this is already provided by michael or maybe ask for it)
    horizontal_fov = 0.60 -- 60 degrees
    vertical_fov = 0.55 -- 60 degrees
    maimum_visible_distance = 1
@@ -18,6 +19,7 @@ function check_block_in_safe_zone(block)
 
    camera_position_in_end_effector = robot.camera_system.transform.position
    camera_position_in_robot =
+   -- TODO api constance
       camera_position_in_end_effector + vector3(0.0980875, 0, robot.lift_system.position + 0.055)
    camera_orientation_in_robot = robot.camera_system.transform.orientation
    -- Visualize safe zone
@@ -74,6 +76,7 @@ function check_block_in_safe_zone(block)
 end
 
 function group_blocks()
+   -- TODO local
    local_list_of_structures = {}
    groups_of_connected_blocks = {}
 
@@ -204,6 +207,7 @@ local create_process_rules_node = function(rules, rule_type, final_target)
    final_target.offset = vector3(0, 0, 0)
 
    return function()
+      -- TODO; this should happen only once in each step
       grouped_blocks = group_blocks()
       if #grouped_blocks == 0 then
          return false, false
