@@ -199,7 +199,7 @@ local function aug_function(self)
                T[y] = true
                if S[self.match_of_Y[y]] == nil then
                   queue:push(self.match_of_Y[y])
-                  self:add_to_tree(self.match_of_Y[y],slackx[y])
+                  add_to_tree(self, self.match_of_Y[y],slackx[y])
                end
             end
          end
