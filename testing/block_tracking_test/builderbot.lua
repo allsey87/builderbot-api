@@ -1,5 +1,6 @@
 package.path = package.path .. ";builderbot/?.lua"
 
+local data
 function init()
    --[[ load modules ]]--
    -- TODO add verbosity control to logger
@@ -17,6 +18,7 @@ function init()
    data = {
       blocks = {},
       obstacles = {},
+      structures = {},
    }
 
    -- enable the robot's camera
@@ -29,6 +31,7 @@ function step()
    -- figure out led color for tags
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
+   robot.api.process_structures(data.structures, data.blocks)
    robot.logger("INFO", data)
 end
 

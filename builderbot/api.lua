@@ -47,6 +47,8 @@ return {
       require('api.process_leds'),
    process_obstacles =
       require('api.process_obstacles'),
+   process_structures =
+      require('api.process_structures'),
    track_blocks =
       require('api.track_blocks'),
 }
