@@ -8,7 +8,11 @@ rules.list = {
          {
             index = vector3(0, 0, 0),
             type = 0
-         }
+         },
+         {
+            index = vector3(0, 1, 0),
+            type = 0
+         },
       },
       target = {
          reference_index = vector3(0, 0, 0),

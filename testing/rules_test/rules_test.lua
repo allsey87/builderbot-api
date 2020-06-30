@@ -19,6 +19,7 @@ function init()
       target = {},
       blocks = {},
       obstacles = {},
+      structures = {},
    }
 
    local create_rule_node = function(pickup_or_place)
@@ -44,13 +45,15 @@ function init()
    bt = robot.utils.behavior_tree.create{
       type = "sequence*", children = {
          robot.nodes.create_search_block_node(data, 
-            robot.api.match_rules(rules, "pickup", data.target)
+            --robot.api.match_rules(rules, "pickup", data.target)
+            create_rule_node("pickup")
          ),
          robot.nodes.create_curved_approach_block_node(data, 0.20),
          robot.nodes.create_pick_up_block_node(data, 0.20),
 
          robot.nodes.create_search_block_node(data, 
-            robot.api.match_rules(rules, "place", data.target)
+            --robot.api.match_rules(rules, "place", data.target)
+            create_rule_node("place")
          ),
          robot.nodes.create_curved_approach_block_node(data, 0.20),
          robot.nodes.create_place_block_node(data, 0.20),
@@ -73,7 +76,11 @@ function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
-   bt()
+   --robot.api.process_structures(data.structures, data.blocks)
+   --bt()
+   
+   robot.api.match_rules(data.blocks, rules, "place", data.target)
+
    --robot.logger("INFO", "data = ")
    --robot.logger("INFO", data)
 end

@@ -75,312 +75,198 @@ function check_block_in_safe_zone(block)
    end
 end
 
-function group_blocks()
-   -- TODO local
-   local_list_of_structures = {}
-   groups_of_connected_blocks = {}
+local function round_by_digits(num, numDecimalPlaces)
+   local mult = 10 ^ (numDecimalPlaces or 0)
+   return math.floor(num * mult + 0.5) / mult
+end
 
-   -- for now we use distances to tell if blocks are connected or not,
-   -- this is not acurate, it could be done by figuring out if two blocks
-   -- share at least one edge, but it would require transforming one block position to the other block
-   function check_connected(block_1, block_2)
+-- generate structure in indices frame from a visual structure or a rule
+local function generate_uniform_structure(structure, view_point)
+   -- view point is the position and orientation relative to structure[1]
+   view_point = view_point or {}
+   view_point.position = view_point.position or vector3()
+   view_point.orientation = view_point.orientation or quaternion()
 
-      result = false
-      orientation_tolerance = 0.0174533 -- one degree
-      distance_tolerance = 0.08
-      orientation_diff =
-         math.sqrt(
-         (block_1.orientation_robot.x - block_2.orientation_robot.x) ^ 2 +
-            (block_1.orientation_robot.y - block_2.orientation_robot.y) ^ 2
-      )
+   -- calculate relative position, camera in viewpoint
+   local block1_in_camera = {
+      position = structure[1].position_robot or structure[1].index,
+      orientation = structure[1].orientation_robot or quaternion(),
+   }
+   local viewpoint_in_camera = {
+      position = block1_in_camera.position + 
+                 vector3(view_point.position):rotate(block1_in_camera.orientation),
+      orientation = view_point.orientation * block1_in_camera.orientation,
+   }
 
-      position_diff =
-         math.sqrt(
-         (block_1.position_robot.x - block_2.position_robot.x) ^ 2 +
-            (block_1.position_robot.y - block_2.position_robot.y) ^ 2 +
-            (block_1.position_robot.z - block_2.position_robot.z) ^ 2
-      )
+   local camera_in_viewpoint = {
+      position = vector3(-viewpoint_in_camera.position):rotate(
+                    viewpoint_in_camera.orientation:inverse()
+                 ),
+      orientation = viewpoint_in_camera.orientation:inverse(),
+   }
 
-      if orientation_diff > orientation_tolerance then
-         result = false
-      else
-         if position_diff < distance_tolerance then
-            result = true
-         else
-            result = false
-         end
-      end
-      return result
+   local side_length = robot.api.constants.block_side_length
+   if structure[1].position_robot == nil then side_length = 1 end
+
+   -- rotate and uniform every block in the structure
+   local uniform_structure = {}
+   for i, block in ipairs(structure) do
+      local block_in_camera = {
+         position = block.position_robot or block.index,
+         orientation = block.orientation_robot or quaternion(),
+      }
+      local uniform_block = {
+         index = camera_in_viewpoint.position +
+                 vector3(block_in_camera.position):rotate(camera_in_viewpoint.orientation)
+      }
+
+      uniform_block.index = uniform_block.index * (1/side_length)
+      uniform_block.index.x = round_by_digits(uniform_block.index.x, 0)
+      uniform_block.index.y = round_by_digits(uniform_block.index.y, 0)
+      uniform_block.index.z = round_by_digits(uniform_block.index.z, 0)
+
+      table.insert(uniform_structure, uniform_block)
    end
 
-   function add_connection_to_list(block_1, block_2)
-      for i, group in pairs(groups_of_connected_blocks) do
-         for j, block in pairs(group) do
-            if block_1.id == block.id and block_1.id ~= block_2.id then
-               table.insert(group, block_2)
-               return
-            elseif block_2.id == block.id and block_1.id ~= block_2.id then
-               table.insert(group, block_1)
-               return
-            end
-         end
+   -- offset indices based on the lowest x,y,z
+   local lowest_x = math.huge
+   local lowest_y = math.huge
+   local lowest_z = math.huge
+   for i, indexed_block in ipairs(uniform_structure) do
+      -- Getting lowest x,y,z (should be seperated along with transform indexed blocks to unified origin)
+      if indexed_block.index.x < lowest_x then
+         lowest_x = indexed_block.index.x
       end
-      -- if the group is new, insert it to the list
-      if block_1.id ~= block_2.id then
-         group = {
-            block_1,
-            block_2
-         }
-      else
-         group = {block_1}
+      if indexed_block.index.y < lowest_y then
+         lowest_y = indexed_block.index.y
       end
-      table.insert(groups_of_connected_blocks, group)
+      if indexed_block.index.z < lowest_z then
+         lowest_z = indexed_block.index.z
+      end
+   end
+   local origin = vector3(lowest_x, lowest_y, lowest_z)
+   -- tranform indexed blocks to unified origin
+   for i, block in pairs(uniform_structure) do
+      block.index = block.index - origin
    end
 
-   function check_connection_exist(block_1, block_2)
-      function has_value(group, block)
-         for index, value in pairs(group) do
-            if value.id == block.id then
-               return true
-            end
-         end
+   return uniform_structure, origin
+end
 
-         return false
-      end
+local function generate_aligned_visual_structures(structures)
+   local structures_in_index_frame = {}
+   for i, group in ipairs(structures) do
+      local new_group = generate_uniform_structure(group)
+      table.insert(structures_in_index_frame, new_group)
+   end
+   return structures_in_index_frame
+end
 
-      result = false
-      for i, group in pairs(groups_of_connected_blocks) do
-         if has_value(group, block_1) and has_value(group, block_2) then
-            result = true
-         end
+local function generate_new_rule_by_rotating_90(rule)
+   local new_rule = robot.utils.shallow_copy(rule)
+   -- note that shallow_copy doesn't work for vector3 and quaternions, so generate new structure 
+   -- and new target based on the old rule.
+   local origin
+   new_rule.structure, origin = generate_uniform_structure(rule.structure, 
+                           {orientation = quaternion(-math.pi/2, vector3(0,0,1))}
+                        )
+   new_rule.target.reference_index = 
+      vector3(rule.target.reference_index - rule.structure[1].index):rotate(quaternion(math.pi/2, vector3(0,0,1))) - origin
+   new_rule.target.offset_from_reference = 
+      vector3(rule.target.offset_from_reference):rotate(quaternion(math.pi/2, vector3(0,0,1)))
+   return new_rule
+end
+
+local function generate_aligned_and_rotated_rules_structures(rules_list)
+   local aligned_and_rotated_rules_list = {}
+   for i, rule in ipairs(rules_list) do
+      local new_rule = rule
+      table.insert(aligned_and_rotated_rules_list, new_rule)
+      new_rule = generate_new_rule_by_rotating_90(new_rule)
+      table.insert(aligned_and_rotated_rules_list, new_rule)
+      new_rule = generate_new_rule_by_rotating_90(new_rule)
+      table.insert(aligned_and_rotated_rules_list, new_rule)
+      new_rule = generate_new_rule_by_rotating_90(new_rule)
+      table.insert(aligned_and_rotated_rules_list, new_rule)
+   end
+   return aligned_and_rotated_rules_list
+end
+
+local function match_structures(visible_structure, rule_structure)
+   function tablelength(T)
+      local count = 0
+      for _ in pairs(T) do
+         count = count + 1
       end
-      return result
+      return count
    end
 
-   for i, block_1 in pairs(api.blocks) do
-      for j, block_2 in pairs(api.blocks) do
-         if block_1.id ~= block_2.id then
-            if check_connection_exist(block_1, block_2) == false then
-               connected = check_connected(block_1, block_2)
-               if connected == true then
-                  add_connection_to_list(block_1, block_2)
+   local structure_matching_result = true
+   if tablelength(visible_structure) ~= #rule_structure then
+      structure_matching_result = false
+   else
+      for j, rule_block in pairs(rule_structure) do
+         local block_matched = false
+         for k, visible_block in pairs(visible_structure) do
+            if visible_block.index == rule_block.index then --found required index
+               if (visible_block.type == rule_block.type) or (rule_block.type == 'X') then -- found the same required type
+                  block_matched = true
+                  break
                end
             end
          end
-      end
-   end
-   for i, block_1 in pairs(api.blocks) do
-      for j, block_2 in pairs(api.blocks) do
-         if block_1.id == block_2.id then
-            if check_connection_exist(block_1, block_2) == false then
-               add_connection_to_list(block_1, block_2)
-            end
+         if block_matched == false then
+            structure_matching_result = false
+            break
          end
       end
    end
-
-   -- TODO either this code is needed or it should be removed   
-   -- Filtering uncertain groups
-   -- pprint.pprint(groups_of_connected_blocks)
-
-   -- filtered_groups_list = {}
-   -- for i, group in pairs(groups_of_connected_blocks) do
-   --    group_clear = true
-   --    for j, block in pairs(group) do
-   --       print('processing block', tostring(block.id), 'in group:', tostring(i))
-   --       if check_block_in_safe_zone(block) == false then
-   --          group_clear = false
-   --          break
-   --       end
-   --    end
-   --    if group_clear == true then
-   --       table.insert(filtered_groups_list, group)
-   --    end
-   -- end
-   filtered_groups_list = groups_of_connected_blocks
-   -- builderbot_api.structure_list = groups_of_connected_blocks
-   return filtered_groups_list
+   return structure_matching_result
+end
+local function get_reference_id_from_index(reference_index, visible_structure)
+   for j, block in pairs(visible_structure) do
+      if block.index == reference_index then
+         return j
+      end
+   end
 end
 
-local create_process_rules_node = function(rules, rule_type, final_target)
+return function(blocks, rules, rule_type, final_target)
    final_target.reference_id = nil
    final_target.offset = vector3(0, 0, 0)
 
+   local structures = {}
+   robot.api.process_structures(structures, blocks)
+   if #structures == 0 then
+      return false
+   end
+
+   -- align visual structures
+   local structures_in_index_frame = generate_aligned_visual_structures(structures)
+
+   -- align rule structures
+   if rules.aligned == nil then 
+      rules.list = generate_aligned_and_rotated_rules_structures(rules.list) 
+      rules.aligned = true
+   end
+
+   robot.logger("INFO","rules")
+   robot.logger("INFO",rules)
+end
+
+--[[
+local create_process_rules_node = function(blocks, rules, rule_type, final_target)
+
    return function()
       -- TODO; this should happen only once in each step
-      grouped_blocks = group_blocks()
-      if #grouped_blocks == 0 then
-         return false, false
-      end
+     
 
-      ------------------------ rotating and indexing the structure ---------------------
-      -- Align structure with virtual robot
-      for i, group in pairs(grouped_blocks) do
-         -- statements
-         -- Get the position and orientation of one of the block in the group
-         b1_in_r1_ori = group[1].orientation_robot
-         b1_in_r1_pos = group[1].position_robot
-         -- we assume having the robot in a different position where
-         -- the position and orientation of the previous block are as follows:
-         b1_in_r2_ori = quaternion(0, 0, 0, 1)
-         b1_in_r2_pos = vector3(0.2, 0, b1_in_r1_pos.z - 0.05)
-         -- we calculate the inverse relation between the imaginary robot r2 and the block
-         r2_in_b1_ori = b1_in_r2_ori:inverse()
-         r2_in_b1_pos = -1 * vector3(b1_in_r2_pos):rotate(r2_in_b1_ori)
-         -- we calculate the relation between the real robot and the imaginary robot
-         r2_in_r1_pos = vector3(r2_in_b1_pos):rotate(b1_in_r1_ori) + b1_in_r1_pos
-         r2_in_r1_ori = b1_in_r1_ori * r2_in_b1_ori
-         -- we calculate the inverse relation between the real robot r1 and the imaginary r2
-         r1_in_r2_ori = r2_in_r1_ori:inverse()
-         r1_in_r2_pos = -1 * vector3(r2_in_r1_pos):rotate(r1_in_r2_ori)
-         bj_in_r2_pos = {}
-
-         for j, block in pairs(group) do
-            -- for each block, we know its relation with r1, and we know the relation r1->r2 so we calculate blocks in r2
-            b_in_r1_pos = block.position_robot
-            b_in_r2_pos = vector3(b_in_r1_pos):rotate(r2_in_r1_ori:inverse()) + r1_in_r2_pos
-            bj_in_r2_pos[tostring(block.id)] = {}
-            bj_in_r2_pos[tostring(block.id)].index = (b_in_r2_pos - b1_in_r2_pos)
-            bj_in_r2_pos[tostring(block.id)].index.z = b_in_r2_pos.z
-            bj_in_r2_pos[tostring(block.id)].type = block.type
-
-            function round(num, numDecimalPlaces)
-               local mult = 10 ^ (numDecimalPlaces or 0)
-               return math.floor(num * mult + 0.5) / mult
-            end
-            -- pprint.pprint(bj_in_r2_pos[tostring(block.id)])
-
-            -- transforming the coordinations to indexes
-            bj_in_r2_pos[tostring(block.id)].index.x = round(bj_in_r2_pos[tostring(block.id)].index.x / 0.05, 0)
-            bj_in_r2_pos[tostring(block.id)].index.y = round(bj_in_r2_pos[tostring(block.id)].index.y / 0.05, 0)
-            bj_in_r2_pos[tostring(block.id)].index.z = round(bj_in_r2_pos[tostring(block.id)].index.z / 0.05, 0)
-         end
-         function get_lowest_indeces(blocks_in_r2)
-            lowest_x = 100
-            lowest_y = 100
-            lowest_z = 100
-            for k, indexed_block in pairs(blocks_in_r2) do
-               -- Getting lowest x,y,z (should be seperated along with transform indexed blocks to unified origin)
-               if indexed_block.index.x < lowest_x then
-                  lowest_x = indexed_block.index.x
-               end
-               if indexed_block.index.y < lowest_y then
-                  lowest_y = indexed_block.index.x
-               end
-               if indexed_block.index.z < lowest_z then
-                  lowest_z = indexed_block.index.x
-               end
-            end
-            return lowest_x, lowest_y, lowest_z
-         end
-         lowest_x, lowest_y, lowest_z = get_lowest_indeces(bj_in_r2_pos)
-
-         -- tranform indexed blocks to unified origin
-         for j, block in pairs(bj_in_r2_pos) do
-            block.index.x = block.index.x - lowest_x
-            block.index.y = block.index.y - lowest_y
-            block.index.z = block.index.z - lowest_z
-         end
-         table.insert(local_list_of_structures, bj_in_r2_pos)
-      end
-      structure_list = local_list_of_structures
       -- pprint.pprint(structure_list)
       ---------------------------------------------------------------------------------------
       --Match current structures against rules
       final_target.reference_id = nil
       final_target.offset = nil
       targets_list = {}
-
-      function match_structures(visible_structure, rule_structure)
-         function tablelength(T)
-            local count = 0
-            for _ in pairs(T) do
-               count = count + 1
-            end
-            return count
-         end
-         structure_matching_result = true
-         if tablelength(visible_structure) ~= #rule_structure then
-            structure_matching_result = false
-         else
-            for j, rule_block in pairs(rule_structure) do
-               block_matched = false
-               for k, visible_block in pairs(visible_structure) do
-                  if visible_block.index == rule_block.index then --found required index
-                     if (visible_block.type == rule_block.type) or (rule_block.type == 'X') then -- found the same required type
-                        block_matched = true
-                        break
-                     end
-                  end
-               end
-               if block_matched == false then
-                  structure_matching_result = false
-                  break
-               end
-            end
-         end
-         return structure_matching_result
-      end
-      function get_reference_id_from_index(reference_index, visible_structure)
-         for j, block in pairs(visible_structure) do
-            if block.index == reference_index then
-               return j
-            end
-         end
-      end
-
-      ------- generate rotated rules ---------------------
-
-      rotated_rules_list = {}
-      for i, rule in pairs(rules.list) do
-         if rule.generate_orientations ~= nil and rule.generate_orientations == true then
-            rotated_rule = deepcopy(rule)
-            rotated_rule.generate_orientations = false
-            for i = 1, 3 do
-               -- statements
-               for j, rule_block in pairs(rotated_rule.structure) do
-                  -- rotate and insert
-                  index = rule_block.index
-                  rule_block.index = vector3(index):rotate(quaternion(0.7071068, 0, 0, 0.7071068))
-               end
-               -- rotate and insert target as well
-               target_index = rotated_rule.target.reference_index
-               rotated_rule.target.reference_index =
-                  vector3(target_index):rotate(quaternion(0.7071068, 0, 0, 0.7071068))
-               table.insert(rotated_rules_list, deepcopy(rotated_rule))
-            end
-         end
-      end
-      ------------- insert generated rules into the main list ----------
-      for i, generated_rule in pairs(rotated_rules_list) do
-         table.insert(rules.list, generated_rule)
-      end
-
-      ------ transform rules to unified origin -----------
-      for i, rule in pairs(rules.list) do
-         lowest_x = 100
-         lowest_y = 100
-         lowest_z = 100
-         for j, rule_block in pairs(rule.structure) do
-            if rule_block.index.x < lowest_x then
-               lowest_x = rule_block.index.x
-            end
-            if rule_block.index.y < lowest_y then
-               lowest_y = rule_block.index.y
-            end
-            if rule_block.index.z < lowest_z then
-               lowest_z = rule_block.index.z
-            end
-         end
-         for j, rule_block in pairs(rule.structure) do
-            rule_block.index.x = round(rule_block.index.x - lowest_x, 0)
-            rule_block.index.y = round(rule_block.index.y - lowest_y, 0)
-            rule_block.index.z = round(rule_block.index.z - lowest_z, 0)
-         end
-         rule.target.reference_index.x = round(rule.target.reference_index.x - lowest_x, 0)
-         rule.target.reference_index.y = round(rule.target.reference_index.y - lowest_y, 0)
-         rule.target.reference_index.z = round(rule.target.reference_index.z - lowest_z, 0)
-      end
 
       function one_block_safe(indexed_structure)
          result = false
@@ -535,3 +421,4 @@ local create_process_rules_node = function(rules, rule_type, final_target)
    end
 end
 return create_process_rules_node
+--]]
