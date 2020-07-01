@@ -9,10 +9,6 @@ rules.list = {
             index = vector3(0, 0, 0),
             type = 0
          },
-         {
-            index = vector3(0, 1, 0),
-            type = 0
-         },
       },
       target = {
          reference_index = vector3(0, 0, 0),
@@ -20,12 +16,13 @@ rules.list = {
       },
       generate_orientations = false
    },
+   --[[
    {
       rule_type = 'place',
       structure = {
          {
             index = vector3(0, 0, 0),
-            type = 2
+            type = 1
          },
       },
       target = {
@@ -34,12 +31,17 @@ rules.list = {
       },
       generate_orientations = false
    },
+   ]]
    {
       rule_type = 'place',
       structure = {
          {
             index = vector3(0, 0, 0),
-            type = 3
+            type = 1
+         },
+         {
+            index = vector3(0, 1, 0),
+            type = 1
          },
       },
       target = {
@@ -48,7 +50,6 @@ rules.list = {
       },
       generate_orientations = false
    }
-   
 }
 rules.selection_method = 'nearest_win'
 return rules

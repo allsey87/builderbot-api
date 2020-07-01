@@ -1,5 +1,7 @@
 function init()
-   robot.directional_leds.set_all_colors("magenta")
+   if robot.id == "block1" or robot.id == "block2" then
+      robot.directional_leds.set_all_colors("magenta")
+   end
 end
 
 function step()

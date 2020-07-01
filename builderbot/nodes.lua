@@ -21,4 +21,6 @@ return {
       require('nodes.obstacle_avoidance'),
    create_random_walk_node =
       require("nodes.random_walk"),
+   create_process_rules_node =
+      require("nodes.process_rules"),
 }
