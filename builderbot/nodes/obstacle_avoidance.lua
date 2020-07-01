@@ -57,7 +57,7 @@ return function(data)
                                                   -robot.api.parameters.default_speed)
                   end
                ),
-               -- turn 180
+               -- turn 90
                -- TODO: remove these hard coded values, use robot.api.parameters.constants
                robot.nodes.create_timer_node(
                   90 / 5,
