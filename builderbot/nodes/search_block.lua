@@ -7,7 +7,7 @@ return function(data, rule_node)
    return {
       type = "sequence*",
       children = {
-         -- prepare, lift to 0.highest
+         -- prepare, lift to highest
          {
             type = "selector",
             children = {
@@ -54,9 +54,16 @@ return function(data, rule_node)
                },
                -- choose a block,
                -- if got one, return true, stop sequence
-               rule_node,
+               {
+                  type = "selector", 
+                  children = {
+                     rule_node, -- return true or false
+                     function() return true end, -- if rule-node doesn't find a match, return running
+                  },
+               },
                function()
                   robot.logger("INFO", "search: rule node match, got a target")
+                  return false, true
                end
             },
          },
