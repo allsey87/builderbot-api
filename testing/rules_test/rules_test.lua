@@ -68,12 +68,14 @@ function init()
 end
 
 function step()
-   --robot.logger("INFO", '----- step -----')
+   --robot.logger("INFO", '----- step -----', robot.system.time)
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
    --robot.api.process_structures(data.structures, data.blocks)
    bt()
+
+   --robot.logger("INFO", data)
 
    --[[
    robot.logger("INFO", "data = ")

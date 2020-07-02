@@ -82,7 +82,7 @@
     </block>
 
     <block id="block3" debug="false">
-      <body position="0.15,-0.10,0" orientation="0,0,0"/>
+      <body position="0.15,-0.055,0" orientation="0,0,0"/>
       <controller config="block"/>
     </block>
   </arena>

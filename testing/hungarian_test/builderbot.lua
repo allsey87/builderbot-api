@@ -20,16 +20,18 @@ end
 
 function step()
    robot.logger("INFO", '[reset: clock = ]')
-   local hungarian = robot.utils.hungarian.create{
-      costMat = {
-         {1, 1, 2},
-         {1, 2, 2},
-         {2, 2, 1},
+   -- TODO: there seems to be a flaw in hungarian
+   local hungarian = robot.utils.hungarian.create(
+      {
+         {0.206, 0.151, 0.1},
+         {0.103, 0.158, 0.1},
+         {0.151, 0.103, 0.1},
       },
-      MAXorMIN = "MIN",
-   }
+      false
+   )
 
    hungarian:aug()
+   robot.logger("INFO", "hungarian1")
    robot.logger("INFO", hungarian)
 end
 
