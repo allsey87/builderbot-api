@@ -171,15 +171,14 @@ local function generate_aligned_and_rotated_rules_structures(rules_list)
    return aligned_and_rotated_rules_list
 end
 
-local function match_structures(visual_structure, rule_structure)
-   -- if no match, return nil
+local function match_structures(visual_structure, rule_structure, offset)
    if #visual_structure ~= #rule_structure then return false end
 
    local structure_matching_result = true
    for i, rule_block in ipairs(rule_structure) do
       local block_matched = false
       for j, visual_block in ipairs(visual_structure) do
-         if visual_block.index == rule_block.index then --found required index
+         if visual_block.index == rule_block.index + offset then --found required index
             if (visual_block.type == rule_block.type) or (rule_block.type == 'X') then -- found the same required type
                block_matched = true
                break
@@ -207,25 +206,27 @@ local function generate_possible_targets(visual_structures, rule_list, rule_type
    local possible_targets = {}
    for i, visual_structure in ipairs(visual_structures) do
       for j, rule in ipairs(rule_list) do
-         -- if match, the reference block's position will be:
-         local reference_position = 
-            visual_structure.index_to_position.offset + 
-            vector3(rule.target.reference_index * robot.api.constants.block_side_length):rotate(
-               visual_structure.index_to_position.orientation
-            )
+         for k, reference_block_in_visual in ipairs(visual_structure) do
+            -- position of the reference block:
+            local reference_position = 
+               visual_structure.index_to_position.offset + 
+               vector3(reference_block_in_visual.index * robot.api.constants.block_side_length):rotate(
+                  visual_structure.index_to_position.orientation
+               )
+            local offset = reference_block_in_visual.index - rule.target.reference_index
+            if rule.rule_type == rule_type and
+               check_position_in_safe_zone(reference_position, rule.safe_zone) and
+               match_structures(visual_structure, rule.structure, offset) then
 
-         if rule.rule_type == rule_type and
-            check_position_in_safe_zone(reference_position, rule.safe_zone) and
-            match_structures(visual_structure, rule.structure) then
-
-            local new_target = {
-               reference_id =
-                  get_block_id_from_index(rule.target.reference_index, visual_structure),
-               offset = rule.target.offset_from_reference,
-               type = rule.target.type,
-               safe = true,
-            }
-            table.insert(possible_targets, new_target)
+               local new_target = {
+                  reference_id =
+                     get_block_id_from_index(rule.target.reference_index, visual_structure),
+                  offset = rule.target.offset_from_reference,
+                  type = rule.target.type,
+                  safe = true,
+               }
+               table.insert(possible_targets, new_target)
+            end
          end
       end
    end
