@@ -1,56 +1,72 @@
+local bt
+--local data
+local rules = require("rules")
+
 function init()
    --[[ load modules ]]--
-   -- TODO add verbosity control to logger
-   -- TODO logger always prints "MODULE_NAME: MESSAGE"
    robot.logger = require('logger')
    robot.utils = require('utils')
    robot.api = require('api')
    robot.nodes = require('nodes')
+
+   robot.logger.enable()
+   robot.logger.set_level("INFO")
+   
    --[[ initialize shared data ]]--
    data = {
-      target = {
-         id = 1,
-         offset = vector3(0,0,0),
-         color = "green",
-      },
-      blocks = {}
+      target = {},
+      blocks = {},
+      obstacles = {},
+      structures = {},
    }
-   --[[ configure and initialize behavior tree ]]--
-   local top_level_node = {
-      type = 'sequence*',
-      children = {
-         robot.nodes.create_pickup_block_node(data, 0.15),
-         -- update the target data
+
+   bt = robot.utils.behavior_tree.create{
+      type = "sequence*", children = {
+         function() robot.logger("INFO", "----- bt restart ------") return false, true end,
+         robot.nodes.create_pick_up_behavior_node(data, rules),
+
          function() 
-            data.target.offset = vector3(0,0,1) 
-            data.target.color = "pink"
-            return false, true 
+            robot.nfc.write("4")
+            return false, true
          end,
-         robot.nodes.create_place_block_node(
-            data,
-            0.15 + robot.api.constants.end_effector_position_offset.x),
-          -- stop
-          function() robot.api.move.with_velocity(0,0) return true end,
-       },
-    }
-    -- generate the behavior tree
-    robot.behavior = 
-      robot.utils.behavior_tree.create(top_level_node)
-    -- enable the robot's camera
-    robot.camera_system.enable()
+
+         robot.nodes.create_place_behavior_node(data, rules),
+
+         function ()
+            robot.logger("INFO", "pick up and place finish")
+            return false, true
+         end,
+      }
+   }
+
+   -- enable the robot's camera
+   robot.camera_system.enable()
+end
+
+local function custom_block_type(block)
+   if block.tags.up ~= nil and block.tags.up.type == 1 and 
+      block.tags.front ~= nil and block.tags.front.type == 2 then
+      return 5
+   end
 end
 
 function step()
-   robot.logger('[step: clock = ]')
+   --robot.logger("INFO", '----- step -----', robot.system.time)
    robot.api.process_blocks(data.blocks)
-   robot.api.process_obstacles()
-   robot.behavior()
+   robot.api.process_leds(data.blocks, custom_block_type)
+   robot.api.process_obstacles(data.obstacles, data.blocks)
+   --robot.api.process_structures(data.structures, data.blocks)
+   bt()
+
+   --robot.logger("INFO", data)
+
+   --[[
+   robot.logger("INFO", "data = ")
+   robot.logger("INFO", data)
+   ]]
 end
 
 function reset()
-    robot.logger('[reset: clock = ]')
-    -- TODO: recreate init shared data
-    -- TODO: recreate behavior tree
 end
 
 function destroy()
