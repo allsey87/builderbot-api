@@ -2,7 +2,7 @@ if robot.logger then
    robot.logger.register_module("api.process_leds")
 end
 
-return function(blocks, custom_type_loader)
+return function(blocks, custom_type_function)
    -- takes tags in camera_frame_reference
    for i, block in ipairs(blocks) do
       for j, tag in pairs(block.tags) do
@@ -16,10 +16,10 @@ return function(blocks, custom_type_loader)
                block.type = tag.type
             end
          end
+      end
 
-         if type(custom_type_loader) == "function" then
-            custom_type_loader(block)
-         end
+      if type(custom_type_function) == "function" then
+         block.type = custom_type_function(block) or block.type
       end
    end
 end
