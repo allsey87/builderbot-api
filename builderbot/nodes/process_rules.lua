@@ -12,6 +12,7 @@ return function(data, rules, rule_type)
         else
             data.target.id = target.reference_id
             data.target.offset = target.offset
+            data.target.type = target.type
             return false, true
         end
     end
