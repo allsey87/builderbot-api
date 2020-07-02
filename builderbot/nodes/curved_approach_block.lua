@@ -28,7 +28,11 @@ return function(data, target_distance)
             local angle = math.atan(robot_to_block.y / robot_to_block.x) * 180 / math.pi
             local tolerance = robot.api.parameters.aim_block_angle_tolerance * 3
 
-            if angle > 40 or angle < -40 then return false, false end
+            -- TODO : find a better solution
+            if angle > 40 or angle < -40 then 
+               robot.logger("INFO", "curved_approach_block: 45 degree case, abort approach")
+               return false, false 
+            end
 
             if target_block.position_robot.x > target_distance + 0.05 then
                if case.left_right_case == 0 and angle > tolerance/2 then case.left_right_case = -1 -- right
@@ -99,6 +103,7 @@ return function(data, target_distance)
                   return true
                end
             end
+            robot.logger("INFO", "forward backup case impossible")
          end,
       },
    }
