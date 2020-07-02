@@ -139,11 +139,12 @@ local function hungarian_match(_old_blocks, _new_blocks)
 
    -- set penalty matrix
       -- fill n * n with 0
+   local penalty_base = 0.1
    local penalty_matrix = {}
    for i = 1, n do 
       penalty_matrix[i] = {}
       for j = 1,n do 
-         penalty_matrix[i][j] = 0
+         penalty_matrix[i][j] = penalty_base
       end
    end
 
@@ -155,16 +156,19 @@ local function hungarian_match(_old_blocks, _new_blocks)
    for i, old_block in ipairs(old_block_array) do
       for j, new_block in ipairs(_new_blocks) do
          local dis = (old_block.position - new_block.position):length()
-         penalty_matrix[i][j] = dis + 0.1   -- 0.1 to make it not 0
+         penalty_matrix[i][j] = dis + penalty_base + 0.01   -- 0.01 to make it not the base
       end
    end
 
+   -- TODO: something is wrong with the hungarian algorithm, 
+   --       when value is near 0, it doesn't give the right answer, 
+   --       this penalty base is a bypass of this problem
    local hun = robot.utils.hungarian.create(penalty_matrix, false) -- false => min problem
    hun:aug()
    -- hun.match_of_X[i] is the index of match for old_block_array[i]
 
    for i, old_block in ipairs(old_block_array) do
-      if penalty_matrix[i][hun.match_of_X[i]] == 0 then
+      if penalty_matrix[i][hun.match_of_X[i]] == penalty_base then
          -- lost
          local index = old_block.index
          _old_blocks[index] = nil
@@ -178,7 +182,7 @@ local function hungarian_match(_old_blocks, _new_blocks)
 
    local index = 1
    for j, new_block in ipairs(_new_blocks) do
-      if penalty_matrix[hun.match_of_Y[j]][j] == 0 then
+      if penalty_matrix[hun.match_of_Y[j]][j] == penalty_base then
          -- new blocks
          while _old_blocks[index] ~= nil do index = index + 1 end
          _old_blocks[index] = new_block
