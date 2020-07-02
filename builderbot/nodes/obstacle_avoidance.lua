@@ -59,12 +59,14 @@ return function(data)
                ),
                -- turn 90
                -- TODO: remove these hard coded values, use robot.api.parameters.constants
-               robot.nodes.create_timer_node(
-                  90 / 5,
-                  function()
-                     robot.api.move.with_bearing(0, 5)
-                  end
-               )
+               function()
+                  local random = robot.random.uniform()
+                  local degree = 5
+                  if random < 0.5 then degree = -5 end
+                  robot.api.move.with_bearing(0, degree)
+                  return false, true
+               end,
+               robot.nodes.create_timer_node(60 / 5),
             }
          }
       }

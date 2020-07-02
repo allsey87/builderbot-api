@@ -22,26 +22,6 @@ function init()
       structures = {},
    }
 
-   local create_rule_node = function(pickup_or_place)
-      -- consider the first block in the array as target
-      return function()
-         for i = 1, 10 do
-            if data.blocks[i] ~= nil then
-               robot.logger("INFO", "rule_node: got a block, id = ", i)
-               data.target = {
-                  id = i,
-                  offset = vector3(),
-               }
-               if pickup_or_place == "place" then
-                  data.target.offset = vector3(0,0,1)
-               end
-               return false, true
-            end
-         end
-         return false, false
-      end
-   end
-
    bt = robot.utils.behavior_tree.create{
       type = "sequence*", children = {
          function() robot.logger("INFO", "----- bt restart ------") return false, true end,

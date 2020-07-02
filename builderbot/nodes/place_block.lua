@@ -12,14 +12,16 @@ return function(data, forward_distance)
          -- recharge
          function()
             robot.electromagnet_system.set_discharge_mode("disable")
+            return false, true
          end,
          -- reach the block
          robot.nodes.create_reach_block_node(data, forward_distance),
          -- change color
          function()
             if data.target.type ~= nil then
-               robot.nfc.write(tostring(data.target.type))
+               robot.nfc.write(tostring(data.target.type)) -- TODO: check whether nfc is still used
             end
+            return false, true
          end,
          -- release block
          function()
