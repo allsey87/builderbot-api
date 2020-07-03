@@ -3,10 +3,8 @@ if robot.logger then
 end
 
 return function(time, method)
-   -- para = {time, func}
-   -- count from 0, to para.time, with increment of api.time_period
-   -- each step do para.func()
-   -- need to do api.process_time everytime
+   -- count a period of time (time parameter)
+   -- each step do method()
    local end_time
    return {
       type = "sequence*",
@@ -16,7 +14,6 @@ return function(time, method)
             return false, true
          end,
          function()
-            -- TODO can we not use robot.system.clock to do this more reliably??
             if robot.system.time > end_time then
                return false, true
             else

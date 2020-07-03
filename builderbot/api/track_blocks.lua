@@ -3,9 +3,9 @@ if robot.logger then
 end
 
 --    this function finds axis of a block :    
---         |Z           Z| /Y       the one pointing up is z
---         |__ Y         |/         the nearest one pointing towards the camera is x
---        /               \         and then y follows right hand coordinate system
+--         |Z           Z| /Y       the one pointing up is Z
+--         |__ Y         |/         the nearest one pointing towards the camera is X
+--        /               \         and then Y follows right hand coordinate system
 --      X/                 \X
 --
 -- All vector in the system of the camera

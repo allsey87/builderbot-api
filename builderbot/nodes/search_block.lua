@@ -41,11 +41,9 @@ return function(data, rule_node)
                      robot.nodes.create_obstacle_avoidance_node(data),
                      -- obstacle clear, random walk
                      function()
-                        -- TODO use robot.random
                         local random_angle =
                            robot.random.uniform(-robot.api.parameters.search_random_range,
-                                        robot.api.parameters.search_random_range)
-                        --robot.api.move(-robot.api.parameters.default_speed, robot.api.parameters.default_speed)
+                                                robot.api.parameters.search_random_range)
                         robot.api.move.with_bearing(robot.api.parameters.default_speed,
                                                     random_angle)
                         return false, true
