@@ -19,6 +19,8 @@ return {
    parameters = {
       default_speed =
          tonumber(robot.params.default_speed or 0.005),
+      default_turn_speed = -- in degree
+         tonumber(robot.params.default_turn_speed or 5),
       search_random_range =
          tonumber(robot.params.search_random_range or 25),
       aim_block_angle_tolerance =
@@ -35,6 +37,10 @@ return {
          tonumber(robot.params.lift_system_rf_cover_threshold or 0.06),
       lift_system_position_tolerance =
          tonumber(robot.params.lift_system_position_tolerance or 0.001),
+      obstacle_avoidance_backup=
+         tonumber(robot.params.obstacle_avoidance_backup or 0.08),
+      obstacle_avoidance_turn =
+         tonumber(robot.params.obstacle_avoidance_turn or 60),
    },
    --[[ initialize submodules ]]--
    match_rules =

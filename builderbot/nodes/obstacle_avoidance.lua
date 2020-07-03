@@ -48,25 +48,23 @@ return function(data)
                   robot.logger("INFO", "obstacle_avoidance: encountered an obstacle, avoiding")
                   return false, true
                end,
-               -- backup 8 cm
-               -- TODO: remove these hard coded values, use robot.api.parameters.constants
+               -- backup for obstacle_avoidance_backup
                robot.nodes.create_timer_node(
-                  0.08 / robot.api.parameters.default_speed,
+                  robot.api.parameters.obstacle_avoidance_backup / robot.api.parameters.default_speed,
                   function()
                      robot.api.move.with_velocity(-robot.api.parameters.default_speed, 
                                                   -robot.api.parameters.default_speed)
                   end
                ),
-               -- turn 90
-               -- TODO: remove these hard coded values, use robot.api.parameters.constants
+               -- turn for obstacle_avoidance_turn, save chance for left and right
                function()
                   local random = robot.random.uniform()
-                  local degree = 5
-                  if random < 0.5 then degree = -5 end
+                  local degree = robot.api.parameters.default_turn_speed
+                  if random < 0.5 then degree = -degree end
                   robot.api.move.with_bearing(0, degree)
                   return false, true
                end,
-               robot.nodes.create_timer_node(60 / 5),
+               robot.nodes.create_timer_node(robot.api.parameters.obstacle_avoidance_turn / robot.api.parameters.default_turn_speed),
             }
          }
       }
