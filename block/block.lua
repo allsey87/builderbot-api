@@ -17,6 +17,10 @@ function init()
    robot.logger.enable()
    robot.logger.set_level("INFO")
 
+   reset()
+end
+
+function reset()
    if robot.id == "block1" then
       robot.api.set_face_color("top", color[1])
       for i = 2, 5 do
@@ -51,8 +55,6 @@ function step()
    end
 end
 
-function reset()
-end
 
 function destroy()
 end

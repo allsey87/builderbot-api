@@ -1,5 +1,5 @@
 local bt
---local data
+--local data -- make data global for debug:w
 local rules = require("rules")
 
 function init()
@@ -12,6 +12,12 @@ function init()
    robot.logger.enable()
    robot.logger.set_level("INFO")
    
+   -- enable the robot's camera
+   robot.camera_system.enable()
+   reset()
+end
+
+function reset()
    --[[ initialize shared data ]]--
    data = {
       target = {},
@@ -38,9 +44,6 @@ function init()
          end,
       }
    }
-
-   -- enable the robot's camera
-   robot.camera_system.enable()
 end
 
 local function custom_block_type(block)
@@ -64,9 +67,6 @@ function step()
    robot.logger("INFO", "data = ")
    robot.logger("INFO", data)
    ]]
-end
-
-function reset()
 end
 
 function destroy()
