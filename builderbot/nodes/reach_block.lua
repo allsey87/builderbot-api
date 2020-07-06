@@ -76,8 +76,10 @@ return function(data, distance)
                      end,
                      -- forward to block
                      robot.nodes.create_timer_node(
-                        (distance - robot.api.constants.end_effector_position_offset.x - 0.005) /
-                           robot.api.parameters.default_speed,
+                        (distance - 
+                         robot.api.constants.end_effector_position_offset.x - 
+                         robot.api.constants.end_effector_nose_length
+                        ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
                                                         robot.api.parameters.default_speed)
@@ -109,8 +111,10 @@ return function(data, distance)
                      end,
                      -- forward in front of block
                      robot.nodes.create_timer_node(
-                        (distance - robot.api.constants.end_effector_position_offset.x - 
-                         robot.api.constants.block_side_length - 0.005
+                        (distance - 
+                         robot.api.constants.end_effector_position_offset.x - 
+                         robot.api.constants.block_side_length - 
+                         robot.api.constants.end_effector_nose_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
@@ -133,8 +137,9 @@ return function(data, distance)
                      end,
                      -- lower lift
                      function()
-                        -- TODO what is 0.055? robot.api.constants.block_side_length?
-                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z - robot.api.constants.block_side_length - 0.005) 
+                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z - 
+                                                       robot.api.constants.block_side_length - 
+                                                       robot.api.constants.end_effector_nose_length) 
                         return false, true
                      end,
                      -- check whether lift to position
@@ -144,8 +149,10 @@ return function(data, distance)
                      end,
                      -- forward in front of block
                      robot.nodes.create_timer_node(
-                        (distance - robot.api.constants.end_effector_position_offset.x - 
-                         robot.api.constants.block_side_length - 0.005
+                        (distance - 
+                         robot.api.constants.end_effector_position_offset.x - 
+                         robot.api.constants.block_side_length - 
+                         robot.api.constants.end_effector_nose_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
@@ -179,8 +186,10 @@ return function(data, distance)
                      end,
                      -- forward in front of block
                      robot.nodes.create_timer_node(
-                        (distance - robot.api.constants.end_effector_position_offset.x - 
-                         robot.api.constants.block_side_length - 0.005
+                        (distance - 
+                         robot.api.constants.end_effector_position_offset.x - 
+                         robot.api.constants.block_side_length - 
+                         robot.api.constants.end_effector_nose_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
