@@ -22,7 +22,7 @@ function logger.mt:__call(level_str, a, ...)
       level <= logger.verbosity_level then
       --print("logger:\t" .. moduleName .. ":" .. info.currentline .. "\t", ...)
       if type(a) == "table" then
-         logger.show_table(a, ...)
+         logger.show_table(moduleName, a, ...)
       else
          print("logger:\t", a, ...)
       end
@@ -76,28 +76,29 @@ function logger.enable(moduleName)
    end
 end
 
-function logger.show_table(table, number, skipindex)
+function logger.show_table(moduleName, table, number, skipindex)
    -- number means how many indents when printing
    if number == nil then number = 0 end
    if type(table) ~= "table" then return nil end
 
    for i, v in pairs(table) do
-      local str = "logger:\t\t"
+      local str = ""
       for j = 1, number do
          str = str .. "\t"
       end
+      local str = str .. "table:\t"
 
       str = str .. tostring(i) .. "\t"
 
       if i == skipindex then
-         print(str .. "SKIPPED")
+         print("logger:\t", str .. "SKIPPED")
       else
          if type(v) == "table" then
-            print(str)
-            logger.show_table(v, number + 1, skipindex)
+            print("logger:\t", str)
+            logger.show_table(moduleName, v, number + 1, skipindex)
          else
             str = str .. tostring(v)
-            print(str)
+            print("logger:\t", str)
          end
       end
    end

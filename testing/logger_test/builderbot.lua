@@ -2,8 +2,6 @@ package.path = package.path .. ";builderbot/?.lua"
 
 function init()
    --[[ load modules ]]--
-   -- TODO add verbosity control to logger
-   -- TODO logger always prints "MODULE_NAME: MESSAGE"
    robot.logger = require('logger')
    robot.utils = require('utils')
    robot.api = require('api')
@@ -13,7 +11,7 @@ function init()
 
    robot.logger.enable()
    robot.logger.enable("logger_test")
-   robot.logger.disable("nil")
+   --robot.logger.disable("nil")
    
    --robot.logger.set_level("ERR")
    --robot.logger.set_level("WARN")
@@ -31,6 +29,9 @@ function step()
    robot.logger("ERR", 'something is wrong')
    robot.logger("WARN", 'something is suspicious')
    robot.logger("NON_SENSE", 'nonsense')
+
+   robot.logger("INFO", {a = 2, b = "test", c = {aa = 22, bb = "testtest"}})
+   robot.logger("INFO", {a = 2, b = "test", c = {aa = 22, bb = "testtest"}}, 2, "c")
    --robot.api.process_blocks(data.blocks)
 
    logger_test()
@@ -38,8 +39,6 @@ end
 
 function reset()
     robot.logger('[reset: clock = ]')
-    -- TODO: recreate init shared data
-    -- TODO: recreate behavior tree
 end
 
 function destroy()

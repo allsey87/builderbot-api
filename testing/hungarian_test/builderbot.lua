@@ -2,8 +2,6 @@ package.path = package.path .. ";builderbot/?.lua"
 
 function init()
    --[[ load modules ]]--
-   -- TODO add verbosity control to logger
-   -- TODO logger always prints "MODULE_NAME: MESSAGE"
    robot.logger = require('logger')
    robot.utils = require('utils')
    robot.api = require('api')

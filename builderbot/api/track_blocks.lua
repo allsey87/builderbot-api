@@ -44,8 +44,7 @@ local function find_block_xyz(position, orientation) -- for camera
 
    -- choose the one pointing nearest(min z) as X
    local nearest_i
-   -- TODO math.huge? 
-   local nearest_z = 99999999999
+   local nearest_z = math.huge
    for i, v in pairs(dirs) do
       if (position + v):length() < nearest_z then nearest_z = (position + v):length(); nearest_i = i end
    end

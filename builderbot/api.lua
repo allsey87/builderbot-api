@@ -1,7 +1,6 @@
 return {
    --[[ initialize constants ]]--
    constants = {
-      time_period = 0.2, --TODO : measure
       block_side_length = 0.055,
       -- from x+, counter-closewise
       block_led_offset_from_tag = {

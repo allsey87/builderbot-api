@@ -22,7 +22,7 @@ return function(data, aim_point)
       end
 
       local tolerance = robot.api.parameters.lift_system_position_tolerance
-      local target_height = robot.lift_system.position - target_tag.position.y -- TODO: refine this calculation
+      local target_height = robot.lift_system.position - target_tag.position.y 
       local upper_limit = robot.api.constants.lift_system_upper_limit
       local lower_limit = robot.api.constants.lift_system_lower_limit + target_block.position_robot.z - 0.02
       if target_height < lower_limit then target_height = lower_limit end

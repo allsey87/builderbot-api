@@ -3,8 +3,6 @@ package.path = package.path .. ";builderbot/?.lua"
 local data
 function init()
    --[[ load modules ]]--
-   -- TODO add verbosity control to logger
-   -- TODO logger always prints "MODULE_NAME: MESSAGE"
    robot.logger = require('logger')
    robot.utils = require('utils')
    robot.api = require('api')
@@ -14,7 +12,6 @@ function init()
    robot.logger.set_level("INFO")
    
    --[[ initialize shared data ]]--
-   -- TODO: share data with robot?
    data = {
       blocks = {},
       obstacles = {},

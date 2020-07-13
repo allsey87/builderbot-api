@@ -3,8 +3,7 @@ if robot.logger then
 end
 
 -- get the size of a table, no matter square or not
--- TODO: use snake_case
-local function getNM_Mat(Mat)
+local function get_nm_from_mat(Mat)
    --[[
    find the size of a Mat
    i.e.
@@ -245,7 +244,7 @@ local function create_function(cost_mat, is_it_max_problem)
    }
 
    -- Set costMat and size N
-   local n,m = getNM_Mat(cost_mat)
+   local n,m = get_nm_from_mat(cost_mat)
    instance.costMat = robot.utils.shallow_copy(cost_mat)
 
    --Asserts
@@ -292,11 +291,10 @@ local function create_function(cost_mat, is_it_max_problem)
 
    --init lx,ly, which are the value labels of X and Y
    instance.lx = {}; instance.ly = {}
+   -- set label of Y with all 0
    for i = 1,n do instance.ly[i] = 0 end
-      --label of Y is all 0
-   -- TODO: math.huge   
-   for i = 1,n do instance.lx[i] = instance.costMat[1][1] - 99999999999 end  -- set to -INF
-      --lx is the max of his cost edges      -- for max problem
+   -- set label of X with the max of his cost edges -- for max problem
+   for i = 1,n do instance.lx[i] = -math.huge end
    for i = 1,n do 
       for j = 1,n do
          if instance.lx[i] < instance.costMat[i][j] then
