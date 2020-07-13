@@ -76,10 +76,16 @@ return function(data, aim_point)
          end
       end
       if turn == "left" then
-         robot.api.move.with_velocity(-robot.api.parameters.default_speed * err, robot.api.parameters.default_speed * err)
+         robot.api.move.with_velocity(-robot.api.parameters.default_speed * err -
+                                         robot.api.parameters.default_speed / 2, 
+                                      robot.api.parameters.default_speed * err +
+                                         robot.api.parameters.default_speed / 2)
          flag_orientation = false
       elseif turn == "right" then
-         robot.api.move.with_velocity(robot.api.parameters.default_speed * err, -robot.api.parameters.default_speed * err)
+         robot.api.move.with_velocity(robot.api.parameters.default_speed * err +
+                                         robot.api.parameters.default_speed / 2,
+                                      -robot.api.parameters.default_speed * err -
+                                         robot.api.parameters.default_speed / 2)
          flag_orientation = false
       elseif turn == "no" then
          robot.api.move.with_velocity(0, 0)
