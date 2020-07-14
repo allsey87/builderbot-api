@@ -10,7 +10,13 @@ return function(time, method)
       type = "sequence*",
       children = {
          function()
-            end_time = robot.system.time + time
+            if type(time) == "function" then
+               end_time = robot.system.time + time()
+            elseif type(time) == "number" then
+               end_time = robot.system.time + time
+            else
+               end_time = robot.system.time
+            end
             return false, true
          end,
          function()
