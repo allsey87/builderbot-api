@@ -30,6 +30,7 @@ return function(data, rule_node)
             },
          },
          -- search
+         -- TODO: maybe it will be better if the robot keeps looking for blocks during obstacle avoidance
          {
             type = "sequence",
             children = {
