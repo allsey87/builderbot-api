@@ -23,6 +23,8 @@ return {
       require("nodes.random_walk"),
    create_process_rules_node =
       require("nodes.process_rules"),
+   create_move_to_location_node =
+      require("nodes.move_to_location"),
 
    create_pick_up_behavior_node =
       require('nodes.pick_up_behavior'),

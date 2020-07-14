@@ -21,7 +21,7 @@ return function(data, distance)
             type = "sequence",
             children = {
                robot.nodes.create_obstacle_avoidance_node(data),
-               robot.nodes.create_move_to_location_node(data, location),
+               robot.nodes.create_move_to_location_node(location),
             }
          }
       }, -- end of the children of go to pre-position

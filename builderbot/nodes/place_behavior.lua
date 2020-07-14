@@ -16,10 +16,13 @@ return function(data, rules)
       end,
       -- place
       { type = "sequence*", children = {
-         robot.nodes.create_search_block_node(data, 
-            robot.nodes.create_process_rules_node(data, rules, "place")
+         robot.nodes.create_approach_block_node(
+            data, 
+            robot.nodes.create_search_block_node(data, 
+               robot.nodes.create_process_rules_node(data, rules, "place")
+            ),
+            0.20
          ),
-         robot.nodes.create_curved_approach_block_node(data, 0.20),
          robot.nodes.create_place_block_node(data, 0.20),
          -- backup
          robot.nodes.create_timer_node(

@@ -46,6 +46,7 @@ return function(data)
             children = {
                function()
                   robot.logger("INFO", "obstacle_avoidance: encountered an obstacle, avoiding")
+                  robot.camera_system.disable()
                   return false, true
                end,
                -- backup for obstacle_avoidance_backup
@@ -65,6 +66,10 @@ return function(data)
                   return false, true
                end,
                robot.nodes.create_timer_node(robot.api.parameters.obstacle_avoidance_turn / robot.api.parameters.default_turn_speed),
+               function()
+                  robot.camera_system.enable()
+                  return false, true
+               end,
             }
          }
       }
