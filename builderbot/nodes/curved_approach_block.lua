@@ -3,7 +3,6 @@ if robot.logger then
 end
 
 return function(data, target_distance)
-   -- TODO this local state CAN NOT be reset -- this depends on how to reset a behavior tree
    local case = {left_right_case = 0, forward_backup_case = 1,}
    local aim = {}
    return {
