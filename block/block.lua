@@ -27,6 +27,10 @@ function reset()
          robot.api.set_face_color(direction[i], color[2])
       end
    end
+
+   if robot.id == "block6" then
+      robot.directional_leds.set_all_colors(color[3])
+   end
 end
 
 function step()

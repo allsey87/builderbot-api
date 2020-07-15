@@ -1,5 +1,5 @@
 local bt
-local data -- make data global for debug in argos lua editor
+--local data -- make data global for debug in argos lua editor
 local rules = require("rules")
 
 function init()
@@ -59,6 +59,7 @@ function step()
    robot.api.process_obstacles(data.obstacles, data.blocks)
 
    bt()
+   robot.debug.draw("arrow(blue)(0,0,0)(1,0,0)")
 end
 
 function destroy()
