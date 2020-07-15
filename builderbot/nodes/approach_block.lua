@@ -29,9 +29,7 @@ return function(data, search_node, distance)
                   type = "sequence*",
                   children = {
                      robot.nodes.create_z_approach_block_node(data, distance + 0.10),
-                     function() print("in approach_node, before search") return false, true end,
                      search_node,
-                     function() print("in approach_node, after search") return false, true end,
                   },
                }, 
             }, -- end of chilren
