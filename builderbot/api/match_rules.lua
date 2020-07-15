@@ -172,8 +172,6 @@ local function generate_aligned_and_rotated_rules_structures(rules_list)
 end
 
 local function match_structures(visual_structure, rule_structure, offset)
-   if #visual_structure ~= #rule_structure then return false end
-
    local structure_matching_result = true
    for i, rule_block in ipairs(rule_structure) do
       local block_matched = false
@@ -220,7 +218,7 @@ local function generate_possible_targets(visual_structures, rule_list, rule_type
 
                local new_target = {
                   reference_id =
-                     get_block_id_from_index(rule.target.reference_index, visual_structure),
+                     get_block_id_from_index(rule.target.reference_index + offset, visual_structure),
                   offset = rule.target.offset_from_reference,
                   type = rule.target.type,
                   safe = true,
