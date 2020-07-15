@@ -3,16 +3,16 @@ if robot.logger then
 end
 
 return {
-   -- TODO use a parameter that is off by default from the XML
+   --TODO check debug draw is working or not
    arrow = function(color, from, to)
-      if robot.debug ~= nil then
-         robot.debug.draw('arrow(' .. color .. ')(' .. from:__tostring() .. ')(' .. to:__tostring() .. ')')
+      if robot.debug ~= nil and
+         robot.api.parameters.draw_switch == true then
+            robot.debug.draw('arrow(' .. color .. ')(' .. from:__tostring() .. ')(' .. to:__tostring() .. ')')
       end
    end,
 
    block_axes = function(block_position, block_orientation, color)
       local z = vector3(0, 0, 1)
-      -- TODO add a switch to enable/disable this
       robot.utils.draw.arrow(color, block_position, block_position + 0.1 * vector3(z):rotate(block_orientation))
    end,
 

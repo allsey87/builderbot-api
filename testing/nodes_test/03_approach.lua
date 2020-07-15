@@ -74,17 +74,14 @@ function init()
 
    -- enable the robot's camera
    robot.camera_system.enable()
+   robot.logger("INFO", "draw_switch = ", robot.api.parameters.draw_switch)
 end
 
 function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
-
    bt()
-
-   --robot.logger("INFO", "data = ")
-   --robot.logger("INFO", data)
 end
 
 function reset()

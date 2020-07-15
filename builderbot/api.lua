@@ -41,6 +41,7 @@ return {
          tonumber(robot.params.obstacle_avoidance_backup or 0.08),
       obstacle_avoidance_turn =
          tonumber(robot.params.obstacle_avoidance_turn or 60),
+      draw_switch = (robot.params.draw_switch == "true")
    },
    --[[ initialize submodules ]]--
    match_rules =

@@ -1,5 +1,5 @@
 local bt
---local data -- make data global for debug:w
+local data -- make data global for debug in argos lua editor
 local rules = require("rules")
 
 function init()
@@ -23,7 +23,6 @@ function reset()
       target = {},
       blocks = {},
       obstacles = {},
-      structures = {},
    }
 
    bt = robot.utils.behavior_tree.create{
@@ -58,15 +57,8 @@ function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks, custom_block_type)
    robot.api.process_obstacles(data.obstacles, data.blocks)
-   --robot.api.process_structures(data.structures, data.blocks)
+
    bt()
-
-   --robot.logger("INFO", data)
-
-   --[[
-   robot.logger("INFO", "data = ")
-   robot.logger("INFO", data)
-   ]]
 end
 
 function destroy()

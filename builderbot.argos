@@ -43,7 +43,8 @@
       </sensors>
 	  <!--params script="/home/mallwright/Workspace/argos3/builderbot_api/builderbot/builderbot.lua" /-->
 	  <params script="builderbot/builderbot.lua" 
-            obstacle_avoidance_turn="90"/>
+            obstacle_avoidance_turn="90"
+            draw_switch="true"/>
     </lua_controller>
 
     <lua_controller id="block">

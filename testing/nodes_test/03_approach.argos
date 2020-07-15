@@ -42,7 +42,8 @@
         <builderbot_nfc implementation="default" show_rays="true" />
       </sensors>
 	  <!--params script="/home/mallwright/Workspace/argos3/builderbot_api/builderbot/builderbot.lua" /-->
-	  <params script="testing/nodes_test/03_approach.lua" />
+	  <params script="testing/nodes_test/03_approach.lua" 
+            draw_switch="true"/>
     </lua_controller>
 
     <lua_controller id="block">
