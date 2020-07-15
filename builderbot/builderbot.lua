@@ -59,6 +59,9 @@ function step()
    robot.api.process_obstacles(data.obstacles, data.blocks)
 
    bt()
+
+   --TODO test draw arrow
+   robot.utils.draw.arrow("green", vector3(0,0,0), vector3(1,0,0.05))
    robot.debug.draw("arrow(blue)(0,0,0)(1,0,0)")
 end
 

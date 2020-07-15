@@ -45,27 +45,30 @@ return function(data)
             type = 'sequence*',
             children = {
                function()
-                  robot.logger("INFO", "obstacle_avoidance: encountered an obstacle, avoiding")
+                  robot.logger("INFO", "obstacle_avoidance: encountered an obstacle, avoiding") 
                   robot.camera_system.disable()
                   return false, true
                end,
                -- backup for obstacle_avoidance_backup
                robot.nodes.create_timer_node(
-                  robot.api.parameters.obstacle_avoidance_backup / robot.api.parameters.default_speed,
                   function()
                      robot.api.move.with_velocity(-robot.api.parameters.default_speed, 
                                                   -robot.api.parameters.default_speed)
+                     return robot.api.parameters.obstacle_avoidance_backup / robot.api.parameters.default_speed
                   end
                ),
-               -- turn for obstacle_avoidance_turn, save chance for left and right
-               function()
-                  local random = robot.random.uniform()
-                  local degree = robot.api.parameters.default_turn_speed
-                  if random < 0.5 then degree = -degree end
-                  robot.api.move.with_bearing(0, degree)
-                  return false, true
-               end,
-               robot.nodes.create_timer_node(robot.api.parameters.obstacle_avoidance_turn / robot.api.parameters.default_turn_speed),
+               robot.nodes.create_timer_node(
+                  function()
+                     local degree = robot.random.uniform(robot.api.parameters.obstacle_avoidance_turn, 180)
+                     local turn_left = robot.random.bernoulli()
+                     if turn_left then
+                        robot.api.move.with_bearing(0, robot.api.parameters.default_turn_speed)
+                     else
+                        robot.api.move.with_bearing(0, -robot.api.parameters.default_turn_speed)
+                     end
+                     return degree / robot.api.parameters.default_turn_speed
+                  end
+               ),
                function()
                   robot.camera_system.enable()
                   return false, true
